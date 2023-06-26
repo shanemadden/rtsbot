@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 
@@ -28,6 +30,24 @@ pub enum WorkerId {
     Creep(ObjectId<Creep>),
     Spawn(ObjectId<StructureSpawn>),
     Tower(ObjectId<StructureTower>),
+}
+
+impl WorkerId {
+    pub fn resolve(&self) -> Option<WorkerReference> {
+        match self {
+            WorkerId::Creep(id) => id.resolve().map(|o| WorkerReference::Creep(o)),
+            WorkerId::Spawn(id) => id.resolve().map(|o| WorkerReference::Spawn(o)),
+            WorkerId::Tower(id) => id.resolve().map(|o| WorkerReference::Tower(o)),
+        }
+    }
+}
+
+// an enum to represent all of the different types of 'worker' object in resolved form
+#[derive(Debug, Clone)]
+pub enum WorkerReference {
+    Creep(Creep),
+    Spawn(StructureSpawn),
+    Tower(StructureTower),
 }
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
@@ -73,4 +93,10 @@ pub enum WorkerRole {
     // structures with worker roles
     Spawn(Spawn),
     Tower(Tower),
+}
+
+#[derive(Default, Debug, Clone)]
+pub struct WorkerState {
+    pub task_queue: VecDeque<Task>,
+    pub worker_reference: Option<WorkerReference>,
 }

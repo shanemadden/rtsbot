@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 
 use log::*;
 use screeps::{game, RoomName};
@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 mod logging;
 mod worker;
 
-use crate::worker::{WorkerId, WorkerRole, Task};
+use crate::worker::{WorkerId, WorkerRole, WorkerState};
 
 // add wasm_bindgen to any function you would like to expose for call from js
 #[wasm_bindgen]
@@ -27,7 +27,7 @@ pub struct ShardState {
     // the tick when this state was created
     pub global_init_time: u32,
     // workers and their task queues (includes creeps as well as structures)
-    pub worker_state: HashMap<(WorkerId, WorkerRole), VecDeque<Task>>,
+    pub worker_state: HashMap<(WorkerId, WorkerRole), WorkerState>,
     // owned room states and spawn queues
     pub colony_state: HashMap<RoomName, ColonyState>,
 }
