@@ -100,8 +100,9 @@ pub enum WorkerRole {
     Tower(Tower),
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct WorkerState {
+    pub role: WorkerRole,
     pub task_queue: VecDeque<Task>,
     pub worker_reference: Option<WorkerReference>,
     pub movement_state: Option<MovementState>,

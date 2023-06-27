@@ -8,8 +8,6 @@ mod logging;
 mod movement;
 mod worker;
 
-use crate::worker::{WorkerId, WorkerRole, WorkerState};
-
 // add wasm_bindgen to any function you would like to expose for call from js
 #[wasm_bindgen]
 pub fn setup() {
@@ -27,18 +25,18 @@ static mut SHARD_STATE: Option<ShardState> = None;
 pub struct ShardState {
     // the tick when this state was created
     pub global_init_time: u32,
-    // workers and their task queues (includes creeps as well as structures)
-    pub worker_state: HashMap<(worker::WorkerId, worker::WorkerRole), worker::WorkerState>,
     // owned room states and spawn queues
     pub colony_state: HashMap<RoomName, ColonyState>,
+    // workers and their task queues (includes creeps as well as structures)
+    pub worker_state: HashMap<(worker::WorkerId, worker::WorkerRole), worker::WorkerState>,
 }
 
 impl Default for ShardState {
     fn default() -> ShardState {
         ShardState {
             global_init_time: game::time(),
-            worker_state: HashMap::new(),
             colony_state: HashMap::new(),
+            worker_state: HashMap::new(),
         }
     }
 }
@@ -58,7 +56,8 @@ pub fn game_loop() {
     // as any other access to it would cause undefined behavior!
     let mut shard_state = unsafe { SHARD_STATE.get_or_insert_with(|| ShardState::default()) };
 
-    // register all creeps that aren't yet in our tracking, and delete the state of any that we can no longer see
+    // register all creeps that aren't yet in our tracking, and delete the state of any that we can
+    // no longer see
     worker::scan_and_register_creeps(&mut shard_state);
 
     // scan for new worker structures as well - every 100 ticks, or if this is the startup tick
@@ -66,11 +65,13 @@ pub fn game_loop() {
         worker::scan_and_register_structures(&mut shard_state);
     }
 
-    // run all registered workers, deleting those that we can't resolve
+    // run all registered workers, attempting to resolve those that haven't already and deleting
+    // any workers that don't resolve
     worker::run_workers(&mut shard_state);
 
-    // run movement phase now that all workers have run, deleting the references to game objects from the current
-    // tick (so that we can ensure they aren't used in future ticks as well as to enable them to be GC'd in js)
+    // run movement phase now that all workers have run, while deleting the references to game
+    // objects from the current tick (so that we can ensure they aren't used in future ticks
+    // as well as to enable them to be GC'd in js)
     movement::run_movement_and_remove_references(&mut shard_state);
 
     info!("done! cpu: {}, global age {}", game::cpu::get_used(), game::time() - shard_state.global_init_time)
