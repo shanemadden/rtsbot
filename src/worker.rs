@@ -9,6 +9,8 @@ use screeps::{
     objects::{ConstructionSite, Structure, StructureController, Resource, Creep, StructureTower, StructureSpawn},
 };
 
+use crate::{ShardState, movement::MovementState};
+
 mod builder;
 mod hauler;
 mod source_harvester;
@@ -32,6 +34,8 @@ pub enum WorkerId {
     Tower(ObjectId<StructureTower>),
 }
 
+
+// resolve the actual worker object if it still exists
 impl WorkerId {
     pub fn resolve(&self) -> Option<WorkerReference> {
         match self {
@@ -42,7 +46,8 @@ impl WorkerId {
     }
 }
 
-// an enum to represent all of the different types of 'worker' object in resolved form
+// an enum to represent all of the different types of 'worker' object, in resolved form
+// to avoid using stale up
 #[derive(Debug, Clone)]
 pub enum WorkerReference {
     Creep(Creep),
@@ -99,4 +104,17 @@ pub enum WorkerRole {
 pub struct WorkerState {
     pub task_queue: VecDeque<Task>,
     pub worker_reference: Option<WorkerReference>,
+    pub movement_state: Option<MovementState>,
+}
+
+pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
+    unimplemented!()
+}
+
+pub fn scan_and_register_structures(shard_state: &mut ShardState) {
+    unimplemented!()
+}
+
+pub fn run_workers(shard_state: &mut ShardState) {
+    unimplemented!()
 }
