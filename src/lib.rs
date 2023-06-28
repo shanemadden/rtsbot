@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 
 mod logging;
 mod movement;
+mod task;
 mod worker;
 
 // add wasm_bindgen to any function you would like to expose for call from js

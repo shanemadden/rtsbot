@@ -5,18 +5,15 @@ use log::*;
 use serde::{Deserialize, Serialize};
 
 use screeps::{
-    constants::{find, ResourceType},
+    constants::find,
     enums::StructureObject,
     game,
     local::ObjectId,
-    objects::{
-        ConstructionSite, Creep, Resource, Structure, StructureController, StructureSpawn,
-        StructureTower,
-    },
+    objects::{Creep, StructureSpawn, StructureTower},
     prelude::*,
 };
 
-use crate::{movement::MovementState, ShardState};
+use crate::{movement::MovementState, task::Task, ShardState};
 
 mod builder;
 mod hauler;
@@ -59,18 +56,6 @@ pub enum WorkerReference {
     Creep(Creep),
     Spawn(StructureSpawn),
     Tower(StructureTower),
-}
-
-#[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
-pub enum Task {
-    // idle until the specified tick
-    IdleUntil(u8),
-    Build(ObjectId<ConstructionSite>),
-    Repair(ObjectId<Structure>),
-    Upgrade(ObjectId<StructureController>),
-    TakeFromResource(ObjectId<Resource>),
-    TakeFromStructure(ObjectId<Structure>, ResourceType),
-    DeliverToStructure(ObjectId<Structure>, ResourceType),
 }
 
 // trait to declare the functions that each role needs to implement
