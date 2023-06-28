@@ -1,11 +1,11 @@
-use serde::{Deserialize, Serialize};
+use crate::worker::{CanFindTask, Task};
 use screeps::local::Position;
-use crate::worker::{Task, CanFindTask};
+use serde::{Deserialize, Serialize};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {
     #[serde(rename = "s")]
-    source_position: Position,
+    pub source_position: Position,
 }
 
 impl CanFindTask for SourceHarvester {

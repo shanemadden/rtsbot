@@ -1,10 +1,10 @@
-use serde::{Deserialize, Serialize};
+use crate::worker::{CanFindTask, Task};
 use screeps::local::RoomName;
-use crate::worker::{Task, CanFindTask};
+use serde::{Deserialize, Serialize};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Spawn {
-    room: RoomName,
+    pub room: RoomName,
 }
 
 impl CanFindTask for Spawn {

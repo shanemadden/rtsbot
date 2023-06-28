@@ -1,15 +1,22 @@
 use std::collections::VecDeque;
 
 use enum_dispatch::enum_dispatch;
+use log::*;
 use serde::{Deserialize, Serialize};
 
 use screeps::{
-    constants::ResourceType,
+    constants::{find, ResourceType},
+    enums::StructureObject,
+    game,
     local::ObjectId,
-    objects::{ConstructionSite, Structure, StructureController, Resource, Creep, StructureTower, StructureSpawn},
+    objects::{
+        ConstructionSite, Creep, Resource, Structure, StructureController, StructureSpawn,
+        StructureTower,
+    },
+    prelude::*,
 };
 
-use crate::{ShardState, movement::MovementState};
+use crate::{movement::MovementState, ShardState};
 
 mod builder;
 mod hauler;
@@ -33,7 +40,6 @@ pub enum WorkerId {
     Spawn(ObjectId<StructureSpawn>),
     Tower(ObjectId<StructureTower>),
 }
-
 
 // resolve the actual worker object if it still exists
 impl WorkerId {
@@ -108,12 +114,91 @@ pub struct WorkerState {
     pub movement_state: Option<MovementState>,
 }
 
+impl WorkerState {
+    pub fn new_with_role_and_reference(
+        role: WorkerRole,
+        worker_reference: WorkerReference,
+    ) -> WorkerState {
+        WorkerState {
+            role,
+            task_queue: VecDeque::new(),
+            worker_reference: Some(worker_reference),
+            movement_state: None,
+        }
+    }
+}
+
 pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
-    unimplemented!()
+    for creep in game::creeps().values() {
+        if creep.spawning() {
+            // we don't want to work with spawning creeps, skip this one!
+            continue;
+        }
+
+        // this function is called at the start of tick, so we can simply assume
+        // every creep has an id; if spawning had run then id-free creeps would be a possibility.
+        let id = WorkerId::Creep(creep.try_id().expect("expected creep to have id!"));
+
+        // check if we've already got a worker
+        if shard_state.worker_state.contains_key(&id) {
+            // there's already a worker object for this creep!
+            continue;
+        }
+
+        let creep_name = creep.name();
+        match serde_json::from_str(&creep_name) {
+            Ok(role) => {
+                // create a worker object and insert it!
+                let worker_state =
+                    WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep));
+                shard_state.worker_state.insert(id, worker_state);
+            }
+            Err(e) => {
+                warn!("couldn't parse creep name {}: {:?}", creep_name, e);
+                let _ = creep.suicide();
+            }
+        }
+    }
 }
 
 pub fn scan_and_register_structures(shard_state: &mut ShardState) {
-    unimplemented!()
+    for room in game::rooms().values() {
+        // narrowing the scan down to just rooms that are owned currently,
+        // as all structure types that are 'workers' in this bot can only
+        // function in owned rooms
+        let owned = room
+            .controller()
+            .map_or(false, |controller| controller.my());
+
+        if owned {
+            let room_name = room.name();
+
+            for structure in room.find(find::MY_STRUCTURES, None) {
+                match structure {
+                    StructureObject::StructureSpawn(spawn) => {
+                        let id = WorkerId::Spawn(spawn.id());
+                        let role = WorkerRole::from(Spawn { room: room_name });
+                        let worker_state = WorkerState::new_with_role_and_reference(
+                            role,
+                            WorkerReference::Spawn(spawn),
+                        );
+                        shard_state.worker_state.insert(id, worker_state);
+                    }
+                    StructureObject::StructureTower(tower) => {
+                        let id = WorkerId::Tower(tower.id());
+                        let role = WorkerRole::Tower(Tower { room: room_name });
+                        let worker_state = WorkerState::new_with_role_and_reference(
+                            role,
+                            WorkerReference::Tower(tower),
+                        );
+                        shard_state.worker_state.insert(id, worker_state);
+                    }
+                    // we don't make workers for any other structure types!
+                    _ => {}
+                }
+            }
+        }
+    }
 }
 
 pub fn run_workers(shard_state: &mut ShardState) {

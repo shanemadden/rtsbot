@@ -28,7 +28,7 @@ pub struct ShardState {
     // owned room states and spawn queues
     pub colony_state: HashMap<RoomName, ColonyState>,
     // workers and their task queues (includes creeps as well as structures)
-    pub worker_state: HashMap<(worker::WorkerId, worker::WorkerRole), worker::WorkerState>,
+    pub worker_state: HashMap<worker::WorkerId, worker::WorkerState>,
 }
 
 impl Default for ShardState {
@@ -67,6 +67,11 @@ pub fn game_loop() {
 
     // run all registered workers, attempting to resolve those that haven't already and deleting
     // any workers that don't resolve
+
+    // game state changes like spawning creeps will start happening here, so this is
+    // intentionally ordered after we've completed all worker scanning for the tick so we
+    // don't need to think about the case of dealing with the object stubs of creeps whose
+    // spawn started this tick
     worker::run_workers(&mut shard_state);
 
     // run movement phase now that all workers have run, while deleting the references to game
@@ -74,5 +79,9 @@ pub fn game_loop() {
     // as well as to enable them to be GC'd and their memory freed in js heap, if js wants to)
     movement::run_movement_and_remove_worker_refs(&mut shard_state);
 
-    info!("done! cpu: {}, global age {}", game::cpu::get_used(), game::time() - shard_state.global_init_time)
+    info!(
+        "done! cpu: {}, global age {}",
+        game::cpu::get_used(),
+        game::time() - shard_state.global_init_time
+    )
 }

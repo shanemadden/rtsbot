@@ -1,4 +1,4 @@
-use screeps::{Position, Direction};
+use screeps::{Direction, Position};
 
 use crate::ShardState;
 
@@ -18,7 +18,7 @@ pub enum MovementProfile {
 }
 
 // enum to track the state of each creep actively moving (or actively standing still)
-// 
+//
 #[derive(Debug, Clone)]
 pub struct MovementState {
     pub goal: Position,
@@ -27,7 +27,7 @@ pub struct MovementState {
     pub goal_range: u8,
     pub avoid_creeps: bool,
     pub stuck_count: u8,
-    pub current_path: Option<(Vec<Direction>, u32)>
+    pub current_path: Option<(Vec<Direction>, u32)>,
 }
 
 pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
