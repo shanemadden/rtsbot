@@ -30,6 +30,6 @@ pub struct MovementState {
     pub current_path: Option<(Vec<Direction>, u32)>
 }
 
-pub fn run_movement_and_remove_references(shard_state: &mut ShardState) {
+pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
     unimplemented!()
 }

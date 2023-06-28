@@ -70,9 +70,9 @@ pub fn game_loop() {
     worker::run_workers(&mut shard_state);
 
     // run movement phase now that all workers have run, while deleting the references to game
-    // objects from the current tick (so that we can ensure they aren't used in future ticks
-    // as well as to enable them to be GC'd in js)
-    movement::run_movement_and_remove_references(&mut shard_state);
+    // objects from the current tick (as a way to ensure they aren't used in future ticks
+    // as well as to enable them to be GC'd and their memory freed in js heap, if js wants to)
+    movement::run_movement_and_remove_worker_refs(&mut shard_state);
 
     info!("done! cpu: {}, global age {}", game::cpu::get_used(), game::time() - shard_state.global_init_time)
 }
