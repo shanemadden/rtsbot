@@ -6,7 +6,7 @@ pub fn repair(worker: &WorkerReference, target: &ObjectId<Structure>) -> TaskRes
     match worker {
         WorkerReference::Creep(creep) => {
             match target.resolve() {
-                Some(target_structure) => {}
+                Some(target_structure) => todo!(),
                 // the repair target is either gone or not in a visible room;
                 // a good potential enhancement here is to include the position in the repair task
                 // enum, and check for visibility (moving there if not visible) before removing

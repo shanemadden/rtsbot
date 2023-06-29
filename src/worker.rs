@@ -54,7 +54,8 @@ impl WorkerId {
 }
 
 // an enum to represent all of the different types of 'worker' object, in resolved form
-// to avoid using stale up
+// these are only valid during the current tick, so we're careful to discard them before
+// the end of the tick
 #[derive(Debug, Clone)]
 pub enum WorkerReference {
     Creep(Creep),
@@ -93,6 +94,19 @@ pub enum WorkerRole {
     // structures with worker roles
     Spawn(Spawn),
     Tower(Tower),
+
+    // when an invalid creep name is found,
+    // this role is assigned so the creep can complain about it!
+    Invalid(Invalid),
+}
+
+#[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
+pub struct Invalid {}
+
+impl CanFindTask for Invalid {
+    fn find_task(&self) -> Task {
+        unimplemented!()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -146,12 +160,15 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
                         WorkerReference::Creep(creep),
                     ),
                     Err(e) => {
-                        // creep name couldn't parse! but, we're in or_insert_with, so we're
-                        // expected to insert something; killing the creep and crashing is
-                        // brittle but gets us to where the creeps are all valid, eventually! ;)
-                        let _ = creep.suicide();
-                        panic!("couldn't parse creep name {}: {:?}", creep_name, e);
-                    }
+                        warn!("couldn't parse creep name {}: {:?}", creep_name, e);
+                        WorkerState {
+                            role: WorkerRole::Invalid(Invalid {}),
+                            task_queue: VecDeque::new(),
+                            worker_reference: Some(WorkerReference::Creep(creep)),
+                            movement_goal: None,
+                            path_state: None,
+                        }
+                    },
                 }
             });
     }
@@ -198,5 +215,5 @@ pub fn scan_and_register_structures(shard_state: &mut ShardState) {
 }
 
 pub fn run_workers(shard_state: &mut ShardState) {
-    unimplemented!()
+    todo!()
 }

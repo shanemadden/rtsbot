@@ -9,7 +9,7 @@ use crate::{task::TaskResult, worker::WorkerReference};
 pub fn take_from_resource(worker: &WorkerReference, target: &ObjectId<Resource>) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
-            Some(resource) => {}
+            Some(resource) => todo!(),
             None => TaskResult::Complete,
         },
         _ => panic!("unsupported worker type!"),
@@ -23,7 +23,7 @@ pub fn take_from_structure(
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
-            Some(structure) => {}
+            Some(structure) => todo!(),
             None => TaskResult::Complete,
         },
         _ => panic!("unsupported worker type!"),
@@ -37,7 +37,7 @@ pub fn deliver_to_structure(
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
-            Some(structure) => {}
+            Some(structure) => todo!(),
             None => TaskResult::Complete,
         },
         _ => panic!("unsupported worker type!"),
