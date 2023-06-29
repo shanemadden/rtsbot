@@ -15,7 +15,7 @@ use screeps::{
 
 use crate::{
     movement::{MovementGoal, PathState},
-    task::Task,
+    task::{Task, TaskResult},
     ShardState,
 };
 
@@ -217,5 +217,38 @@ pub fn scan_and_register_structures(shard_state: &mut ShardState) {
 }
 
 pub fn run_workers(shard_state: &mut ShardState) {
-    todo!()
+    // track which worker ids can't resolve and should be removed from the hashmap after iteration
+    let mut remove_worker_ids = vec![];
+
+    for (worker_id, worker_state) in shard_state.worker_state.iter_mut() {
+        let worker_reference = match worker_state.worker_reference {
+            Some(worker) => worker,
+            None => match worker_id.resolve() {
+                Some(resolved_worker) => {
+                    worker_state.worker_reference = Some(resolved_worker.clone());
+                    resolved_worker
+                },
+                None => {
+                    // we can't see this worker anymore; mark to destroy
+                    remove_worker_ids.push(worker_id);
+                    continue;
+                }
+            }
+        };
+
+        match worker_state.task_queue.pop_front() {
+            Some(task) => {
+                // we've got a task, run it!
+                match task.run_task(worker_reference) {
+                    // nothing to do if complete, already popped
+                    TaskResult::Complete => {},
+                    TaskResult::StillWorking => worker_state.task_queue.push_front(task),
+                }
+            },
+            None => {
+                // no task in queue, let's find one for next tick (even if it's just to go idle)
+                worker_state.task_queue.push_back(worker_state.role.find_task())
+            }
+        }
+    }
 }
