@@ -42,7 +42,7 @@ pub enum WorkerId {
     Tower(ObjectId<StructureTower>),
 }
 
-// resolve the actual worker object if it still exists
+// resolve the actual worker object - if it still exists
 impl WorkerId {
     pub fn resolve(&self) -> Option<WorkerReference> {
         match self {
@@ -243,7 +243,10 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 match task.run_task(&worker_ref) {
                     // nothing to do if complete, already popped
                     TaskResult::Complete => {}
-                    TaskResult::StillWorking => worker_state.task_queue.push_front(task),
+                    TaskResult::StillWorking(optional_move_goal) => {
+                        worker_state.movement_goal = optional_move_goal;
+                        worker_state.task_queue.push_front(task)
+                    },
                 }
             }
             None => {

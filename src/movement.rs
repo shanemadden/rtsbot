@@ -3,7 +3,7 @@ use screeps::{Direction, Position};
 use crate::ShardState;
 
 // enum for the different speeds available to creeps
-#[derive(Debug, Clone, Copy)]
+#[derive(Eq, PartialEq, Hash, Debug, Clone, Copy)]
 pub enum MovementProfile {
     // can move at full speed on swamp (either 5:1 move parts ratio, or
     // all parts are move/empty carry)
@@ -19,11 +19,11 @@ pub enum MovementProfile {
 
 // struct for specifying where a creep wants to move and the options the pathfinder
 // will need to know to get them there
-#[derive(Debug, Clone, Copy)]
+#[derive(Eq, PartialEq, Hash, Debug, Clone, Copy)]
 pub struct MovementGoal {
     pub goal: Position,
     pub goal_range: u8,
-    pub priority: f64,
+    pub priority: u32,
     pub profile: MovementProfile,
     pub avoid_creeps: bool,
 }

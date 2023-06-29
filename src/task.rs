@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use screeps::{constants::ResourceType, game, local::ObjectId, objects::*};
 
-use crate::worker::WorkerReference;
+use crate::{worker::WorkerReference, movement::MovementGoal};
 
 mod build;
 mod logistics;
@@ -12,7 +12,7 @@ mod upgrade;
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub enum TaskResult {
     Complete,
-    StillWorking,
+    StillWorking(Option<MovementGoal>),
 }
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
@@ -34,7 +34,7 @@ impl Task {
                 if game::time() >= *tick {
                     TaskResult::Complete
                 } else {
-                    TaskResult::StillWorking
+                    TaskResult::StillWorking(None)
                 }
             }
             // remaining task types are more complex and have handlers
