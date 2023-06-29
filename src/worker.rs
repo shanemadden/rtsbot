@@ -235,7 +235,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
         }
 
         // we've either resolved the worker or continue has jumped out of the loop, unwrap
-        let worker_ref = worker_state.worker_reference.as_mut().unwrap();
+        let worker_ref = worker_state.worker_reference.as_ref().unwrap();
 
         match worker_state.task_queue.pop_front() {
             Some(task) => {
