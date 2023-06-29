@@ -22,8 +22,8 @@ pub enum Task {
     Repair(ObjectId<Structure>),
     Upgrade(ObjectId<StructureController>),
     TakeFromResource(ObjectId<Resource>),
-    TakeFromStructure(ObjectId<StructureObject>, ResourceType),
-    DeliverToStructure(ObjectId<StructureObject>, ResourceType),
+    TakeFromStructure(ObjectId<Structure>, ResourceType),
+    DeliverToStructure(ObjectId<Structure>, ResourceType),
 }
 
 impl Task {
@@ -42,8 +42,8 @@ impl Task {
             Task::Repair(id) => repair::repair(worker, id),
             Task::Upgrade(id) => upgrade::upgrade(worker, id),
             Task::TakeFromResource(id) => logistics::take_from_resource(worker, id),
-            Task::TakeFromStructure(id, ty) => logistics::take_from_structure(worker, id, *ty),
-            Task::DeliverToStructure(id, ty) => logistics::deliver_to_structure(worker, id, *ty),
+            Task::TakeFromStructure(id, ty) => logistics::take_from_structure(worker, *id, *ty),
+            Task::DeliverToStructure(id, ty) => logistics::deliver_to_structure(worker, *id, *ty),
         }
     }
 }

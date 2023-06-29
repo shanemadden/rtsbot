@@ -45,7 +45,7 @@ pub fn take_from_resource(worker: &WorkerReference, target: &ObjectId<Resource>)
 
 pub fn take_from_structure(
     worker: &WorkerReference,
-    target: &ObjectId<Structure>,
+    target: ObjectId<Structure>,
     resource_type: ResourceType,
 ) -> TaskResult {
     match worker {
@@ -58,7 +58,7 @@ pub fn take_from_structure(
                         Err(e) => match e {
                             ErrorCode::NotInRange => {
                                 let move_goal = MovementGoal {
-                                    goal: structure.pos().into(),
+                                    goal: structure_object.pos().into(),
                                     goal_range: 1,
                                     priority: 1,
                                     profile: MovementProfile::RoadsOneToTwo,
@@ -91,7 +91,7 @@ pub fn take_from_structure(
 
 pub fn deliver_to_structure(
     worker: &WorkerReference,
-    target: &ObjectId<StructureObject>,
+    target: ObjectId<Structure>,
     resource_type: ResourceType,
 ) -> TaskResult {
     match worker {
