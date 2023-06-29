@@ -246,7 +246,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                     TaskResult::StillWorking(optional_move_goal) => {
                         worker_state.movement_goal = optional_move_goal;
                         worker_state.task_queue.push_front(task)
-                    },
+                    }
                 }
             }
             None => {

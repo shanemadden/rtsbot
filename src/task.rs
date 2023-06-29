@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use screeps::{constants::ResourceType, enums::StructureObject, game, local::ObjectId, objects::*};
+use screeps::{constants::ResourceType, game, local::ObjectId, objects::*};
 
-use crate::{worker::WorkerReference, movement::MovementGoal};
+use crate::{movement::MovementGoal, worker::WorkerReference};
 
 mod build;
 mod logistics;

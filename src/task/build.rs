@@ -1,7 +1,11 @@
 use log::*;
-use screeps::{local::ObjectId, objects::ConstructionSite, constants::ErrorCode};
+use screeps::{constants::ErrorCode, local::ObjectId, objects::ConstructionSite};
 
-use crate::{task::TaskResult, worker::WorkerReference, movement::{MovementGoal, MovementProfile}};
+use crate::{
+    movement::{MovementGoal, MovementProfile},
+    task::TaskResult,
+    worker::WorkerReference,
+};
 
 pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> TaskResult {
     match worker {
@@ -19,25 +23,25 @@ pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> T
                                 avoid_creeps: false,
                             };
                             TaskResult::StillWorking(Some(move_goal))
-                        },
+                        }
                         ErrorCode::InvalidTarget => {
                             // creep's standing on the construction site, and it's not walkable
                             // should maybe make it flee..
                             TaskResult::Complete
-                        },
+                        }
                         e => {
                             // failed for some other reason?
                             info!("build failure: {:?}", e);
                             TaskResult::Complete
                         }
-                    }
+                    },
                 }
-            },
+            }
             // the construction site is either gone or not in a visible room;
             // a good potential enhancement here is to include the position in the build task
             // enum, and check for visibility (moving there if not visible) before removing
             None => TaskResult::Complete,
-        }
+        },
         _ => panic!("unsupported worker type!"),
     }
 }
