@@ -28,11 +28,9 @@ pub struct MovementGoal {
     pub avoid_creeps: bool,
 }
 
-// struct for tracking the current state of a moving creep - which goal it's on the
-// way toward, and the cached path
+// struct for tracking the current state of a moving creep
 #[derive(Debug, Clone)]
 pub struct PathState {
-    pub goal: MovementGoal,
     pub stuck_count: u8,
     pub current_path: Vec<Direction>,
     pub current_path_progress: u32,

@@ -13,7 +13,7 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{movement::MovementState, task::Task, ShardState};
+use crate::{movement::{MovementGoal, PathState}, task::Task, ShardState};
 
 mod builder;
 mod hauler;
@@ -96,7 +96,8 @@ pub struct WorkerState {
     pub role: WorkerRole,
     pub task_queue: VecDeque<Task>,
     pub worker_reference: Option<WorkerReference>,
-    pub movement_state: Option<MovementState>,
+    pub movement_goal: Option<MovementGoal>,
+    pub path_state: Option<PathState>,
 }
 
 impl WorkerState {
@@ -108,7 +109,8 @@ impl WorkerState {
             role,
             task_queue: VecDeque::new(),
             worker_reference: Some(worker_reference),
-            movement_state: None,
+            movement_goal: None,
+            path_state: None,
         }
     }
 }
