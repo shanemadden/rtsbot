@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 
-use screeps::{game, constants::ResourceType, local::ObjectId, objects::*};
+use screeps::{constants::ResourceType, game, local::ObjectId, objects::*};
 
 use crate::worker::WorkerReference;
 
 mod build;
+mod logistics;
 mod repair;
 mod upgrade;
-mod logistics;
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub enum TaskResult {
@@ -36,7 +36,7 @@ impl Task {
                 } else {
                     TaskResult::StillWorking
                 }
-            },
+            }
             // remaining task types are more complex and have handlers
             Task::Build(id) => build::build(worker, id),
             Task::Repair(id) => repair::repair(worker, id),

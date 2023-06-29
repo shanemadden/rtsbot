@@ -13,7 +13,11 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{movement::{MovementGoal, PathState}, task::Task, ShardState};
+use crate::{
+    movement::{MovementGoal, PathState},
+    task::Task,
+    ShardState,
+};
 
 mod builder;
 mod hauler;
