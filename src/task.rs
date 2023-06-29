@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use screeps::{constants::ResourceType, game, local::ObjectId, objects::*};
+use screeps::{constants::ResourceType, enums::StructureObject, game, local::ObjectId, objects::*};
 
 use crate::{worker::WorkerReference, movement::MovementGoal};
 
@@ -22,8 +22,8 @@ pub enum Task {
     Repair(ObjectId<Structure>),
     Upgrade(ObjectId<StructureController>),
     TakeFromResource(ObjectId<Resource>),
-    TakeFromStructure(ObjectId<Structure>, ResourceType),
-    DeliverToStructure(ObjectId<Structure>, ResourceType),
+    TakeFromStructure(ObjectId<StructureObject>, ResourceType),
+    DeliverToStructure(ObjectId<StructureObject>, ResourceType),
 }
 
 impl Task {
