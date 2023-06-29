@@ -150,7 +150,9 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
             .worker_state
             .entry(id)
             .and_modify(|worker_state| {
-                worker_state.worker_reference = Some(WorkerReference::Creep(creep))
+                // cloning the creep here so it's not moved and unavailable to the or_insert_with
+                // branch below
+                worker_state.worker_reference = Some(WorkerReference::Creep(creep.clone()))
             })
             .or_insert_with(|| {
                 let creep_name = creep.name();
