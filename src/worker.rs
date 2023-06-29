@@ -126,29 +126,34 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
             continue;
         }
 
-        // this function is called at the start of tick, so we can simply assume
+        // this function is called at the start of tick before any tasks, so we can simply assume
         // every creep has an id; if spawning had run then id-free creeps would be a possibility.
         let id = WorkerId::Creep(creep.try_id().expect("expected creep to have id!"));
 
-        // check if we've already got a worker
-        if shard_state.worker_state.contains_key(&id) {
-            // there's already a worker object for this creep!
-            continue;
-        }
-
-        let creep_name = creep.name();
-        match serde_json::from_str(&creep_name) {
-            Ok(role) => {
-                // create a worker object and insert it!
-                let worker_state =
-                    WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep));
-                shard_state.worker_state.insert(id, worker_state);
-            }
-            Err(e) => {
-                warn!("couldn't parse creep name {}: {:?}", creep_name, e);
-                let _ = creep.suicide();
-            }
-        }
+        // update the reference if there's already a worker for this creep id,
+        // or parse the name and add it if it's not there
+        shard_state
+            .worker_state
+            .entry(id)
+            .and_modify(|worker_state| {
+                worker_state.worker_reference = Some(WorkerReference::Creep(creep))
+            })
+            .or_insert_with(|| {
+                let creep_name = creep.name();
+                match serde_json::from_str(&creep_name) {
+                    Ok(role) => WorkerState::new_with_role_and_reference(
+                        role,
+                        WorkerReference::Creep(creep),
+                    ),
+                    Err(e) => {
+                        // creep name couldn't parse! but, we're in or_insert_with, so we're
+                        // expected to insert something; killing the creep and crashing is
+                        // brittle but gets us to where the creeps are all valid, eventually! ;)
+                        let _ = creep.suicide();
+                        panic!("couldn't parse creep name {}: {:?}", creep_name, e);
+                    }
+                }
+            });
     }
 }
 
