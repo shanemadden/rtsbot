@@ -17,17 +17,25 @@ pub enum MovementProfile {
     Obstacle,
 }
 
-// enum to track the state of each creep actively moving (or actively standing still)
-//
-#[derive(Debug, Clone)]
-pub struct MovementState {
+// struct for specifying where a creep wants to move and the options the pathfinder
+// will need to know to get them there
+#[derive(Debug, Clone, Copy)]
+pub struct MovementGoal {
     pub goal: Position,
+    pub goal_range: u8,
     pub priority: f64,
     pub profile: MovementProfile,
-    pub goal_range: u8,
     pub avoid_creeps: bool,
+}
+
+// struct for tracking the current state of a moving creep - which goal it's on the
+// way toward, and the cached path
+#[derive(Debug, Clone)]
+pub struct PathState {
+    pub goal: MovementGoal,
     pub stuck_count: u8,
-    pub current_path: Option<(Vec<Direction>, u32)>,
+    pub current_path: Vec<Direction>,
+    pub current_path_progress: u32,
 }
 
 pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {

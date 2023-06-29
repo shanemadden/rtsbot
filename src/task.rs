@@ -37,7 +37,7 @@ impl Task {
                     TaskResult::StillWorking
                 }
             },
-            // remaining task types have handlers
+            // remaining task types are more complex and have handlers
             Task::Build(id) => build::build(worker, id),
             Task::Repair(id) => repair::repair(worker, id),
             Task::Upgrade(id) => upgrade::upgrade(worker, id),
