@@ -1,4 +1,4 @@
-use crate::worker::{CanFindTask, Task};
+use crate::{worker::Worker, task::Task};
 use screeps::local::RoomName;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +10,7 @@ pub struct Upgrader {
     pub id: u8,
 }
 
-impl CanFindTask for Upgrader {
+impl Worker for Upgrader {
     fn find_task(&self) -> Task {
         unimplemented!()
     }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use screeps::{Direction, Position};
 
 use crate::ShardState;
@@ -23,7 +25,6 @@ pub enum MovementProfile {
 pub struct MovementGoal {
     pub goal: Position,
     pub goal_range: u8,
-    pub priority: u32,
     pub profile: MovementProfile,
     pub avoid_creeps: bool,
 }
@@ -35,10 +36,25 @@ pub struct PathState {
     // hasn't registered a new goal before using this cached state
     pub goal: MovementGoal,
     pub stuck_count: u8,
-    pub current_path: Vec<Direction>,
-    pub current_path_progress: u32,
+    pub next_position: Position,
+    pub path: Vec<Direction>,
+    pub path_progress: u32,
 }
 
 pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
-    unimplemented!()
+    // creeps that are idle register themselves in this hashmap so that creeps
+    // moving to their position can get them to swap positions as a simple
+    // 'traffic management' mechanic
+    let mut idle_creeps = HashMap::new();
+    // and creeps that are moving register where they're looking to move here
+    // when they do, so that we can look for idle creeps at that location
+    // to swap with
+    let mut move_creeps = HashMap::new();
+    // loop through all workers, removing their reference for use
+    // during this movement step (or simply discarded in the case
+    // of worker roles that can't move)
+    for worker_state in shard_state.worker_state.values_mut() {
+        // take the reference out of the worker
+        worker_state.worker_reference.take()
+    }
 }

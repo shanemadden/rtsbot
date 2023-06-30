@@ -66,16 +66,21 @@ pub enum WorkerReference {
 // trait to declare the functions that each role needs to implement
 // to be called by enum_dispatch
 #[enum_dispatch]
-pub trait CanFindTask {
+pub trait Worker {
     // function to be called for the worker when it has no work to do,
     // so that it can find another task (even if it's just to idle)
     fn find_task(&self) -> Task;
+
+    // default implementation saying worker types can move
+    fn can_move(&self) -> bool {
+        true
+    }
 }
 
 // an enum to represent all types of worker role, along with
 // any embedded data needed for the worker to rebuild its state;
 // the serialized version of these are used for creep names
-#[enum_dispatch(CanFindTask)]
+#[enum_dispatch(Worker)]
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum WorkerRole {
     // Creep worker types, with assigned room name
@@ -103,9 +108,10 @@ pub enum WorkerRole {
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Invalid {}
 
-impl CanFindTask for Invalid {
+impl Worker for Invalid {
     fn find_task(&self) -> Task {
-        unimplemented!()
+        // broken creep! idle until the end of time
+        Task::IdleUntil(u32::MAX)
     }
 }
 
@@ -228,6 +234,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                     worker_state.worker_reference = Some(resolved_worker);
                 }
                 None => {
+                    // couldn't resolve the worker, mark it for removal
                     remove_worker_ids.push(worker_id.clone());
                     continue;
                 }

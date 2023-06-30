@@ -1,4 +1,4 @@
-use crate::worker::{CanFindTask, Task};
+use crate::{worker::Worker, task::Task};
 use screeps::local::RoomName;
 use serde::{Deserialize, Serialize};
 
@@ -7,8 +7,12 @@ pub struct Spawn {
     pub room: RoomName,
 }
 
-impl CanFindTask for Spawn {
+impl Worker for Spawn {
     fn find_task(&self) -> Task {
         unimplemented!()
+    }
+    
+    fn can_move(&self) -> bool {
+        false
     }
 }

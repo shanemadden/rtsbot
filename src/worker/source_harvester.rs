@@ -1,4 +1,4 @@
-use crate::worker::{CanFindTask, Task};
+use crate::{worker::Worker, task::Task};
 use screeps::local::Position;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +8,7 @@ pub struct SourceHarvester {
     pub source_position: Position,
 }
 
-impl CanFindTask for SourceHarvester {
+impl Worker for SourceHarvester {
     fn find_task(&self) -> Task {
         unimplemented!()
     }
