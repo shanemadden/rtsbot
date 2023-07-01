@@ -1,6 +1,9 @@
-use crate::{task::Task, worker::Worker};
-use screeps::local::RoomName;
+use log::*;
 use serde::{Deserialize, Serialize};
+
+use screeps::{local::RoomName, objects::Store};
+
+use crate::{game, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Tower {
@@ -8,7 +11,7 @@ pub struct Tower {
 }
 
 impl Worker for Tower {
-    fn find_task(&self) -> Task {
+    fn find_task(&self, store: &Store) -> Task {
         unimplemented!()
     }
 }

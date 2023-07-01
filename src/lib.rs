@@ -20,6 +20,12 @@ mod constants {
     // limits for pathfinder calls
     pub const MAX_OPS: u32 = 100_000;
     pub const MAX_ROOMS: u8 = 64;
+    // when task finding fails, idle this long
+    pub const NO_TASK_IDLE_TICKS: u32 = 5;
+    // consider energy for grabbing above this amount
+    pub const ENERGY_PICKUP_THRESHOLD: u32 = 35;
+    // consider energy for withdraw from structures above this amount
+    pub const ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
 }
 
 // add wasm_bindgen to any function you would like to expose for call from js

@@ -5,6 +5,7 @@ use screeps::{constants::ResourceType, game, local::ObjectId, objects::*};
 use crate::{movement::MovementGoal, worker::WorkerReference};
 
 mod build;
+mod harvest;
 mod logistics;
 mod repair;
 mod upgrade;
@@ -18,6 +19,7 @@ pub enum TaskResult {
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum Task {
     IdleUntil(u32),
+    HarvestEnergy(ObjectId<Source>),
     Build(ObjectId<ConstructionSite>),
     Repair(ObjectId<Structure>),
     Upgrade(ObjectId<StructureController>),
@@ -38,6 +40,7 @@ impl Task {
                 }
             }
             // remaining task types are more complex and have handlers
+            Task::HarvestEnergy(id) => harvest::harvest_energy(worker, id),
             Task::Build(id) => build::build(worker, id),
             Task::Repair(id) => repair::repair(worker, id),
             Task::Upgrade(id) => upgrade::upgrade(worker, id),

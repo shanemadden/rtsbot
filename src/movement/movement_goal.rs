@@ -109,6 +109,7 @@ impl MovementGoal {
             }
         };
 
+        // warn if we got an incomplete path, but still use it
         if search_result.incomplete() {
             warn!(
                 "incomplete search! {} {} {}",
@@ -117,13 +118,15 @@ impl MovementGoal {
                 self.goal_pos
             );
         }
-        let positions = search_result.path();
-        let mut steps = vec![];
-
+        // start cursor from the current postion
         let mut cursor_pos = from_position;
+        // load the path from the search result, which is Vec<Position>
+        let positions = search_result.path();
+        // make a Vec<Direction> for our stored path, which is more compact
+        let mut steps = Vec::with_capacity(positions.len());
         for pos in positions {
             // skip storing this step if it's just a room boundary change
-            // that'll happen automatically thanks to the edge tile
+            // that'll happen automatically thanks to the edge tile's swap-every-tick
             if pos.room_name() == cursor_pos.room_name() {
                 match pos.get_direction_to(cursor_pos) {
                     Some(v) => {

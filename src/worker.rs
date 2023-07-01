@@ -9,7 +9,7 @@ use screeps::{
     enums::StructureObject,
     game,
     local::{ObjectId, Position},
-    objects::{Creep, StructureSpawn, StructureTower},
+    objects::{Creep, StructureSpawn, StructureTower, Store},
     prelude::*,
 };
 
@@ -33,8 +33,8 @@ use self::spawn::Spawn;
 use self::tower::Tower;
 use self::upgrader::Upgrader;
 
-// an enum to represent all of the different types of 'worker' object id we may have
-// for resolving the objects each tick for work
+/// Represents all of the different types of 'worker' object id we may have
+/// for resolving the objects each tick for work
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone)]
 pub enum WorkerId {
     Creep(ObjectId<Creep>),
@@ -42,8 +42,8 @@ pub enum WorkerId {
     Tower(ObjectId<StructureTower>),
 }
 
-// resolve the actual worker object - if it still exists
 impl WorkerId {
+    /// Resolve the WorkerId into a WorkerReference if it still exists
     pub fn resolve(&self) -> Option<WorkerReference> {
         match self {
             WorkerId::Creep(id) => id.resolve().map(|o| WorkerReference::Creep(o)),
@@ -53,9 +53,10 @@ impl WorkerId {
     }
 }
 
-// an enum to represent all of the different types of 'worker' object, in resolved form
-// these are only valid during the current tick, so we're careful to discard them before
-// the end of the tick
+/// Represents all of the different types of 'worker' object, in resolved form.
+///
+/// These are only valid during the current tick, so we're very careful to discard them before
+/// the end of the tick
 #[derive(Debug, Clone)]
 pub enum WorkerReference {
     Creep(Creep),
@@ -64,6 +65,7 @@ pub enum WorkerReference {
 }
 
 impl WorkerReference {
+    /// Get the worker's current position
     pub fn pos(&self) -> Position {
         match self {
             WorkerReference::Creep(o) => o.pos(),
@@ -72,10 +74,20 @@ impl WorkerReference {
         }
     }
 
+    /// Get the worker's fatigue (for the movement library)
     pub fn fatigue(&self) -> u32 {
         match self {
             WorkerReference::Creep(o) => o.fatigue(),
             _ => 0,
+        }
+    }
+
+    /// Get the worker's store (for task finding)
+    pub fn store(&self) -> Store {
+        match self {
+            WorkerReference::Creep(o) => o.store(),
+            WorkerReference::Spawn(o) => o.store(),
+            WorkerReference::Tower(o) => o.store(),
         }
     }
 }
@@ -86,7 +98,7 @@ impl WorkerReference {
 pub trait Worker {
     // function to be called for the worker when it has no work to do,
     // so that it can find another task (even if it's just to idle)
-    fn find_task(&self) -> Task;
+    fn find_task(&self, store: &Store) -> Task;
 
     // default implementation saying worker types can move
     fn can_move(&self) -> bool {
@@ -126,8 +138,8 @@ pub enum WorkerRole {
 pub struct Invalid {}
 
 impl Worker for Invalid {
-    fn find_task(&self) -> Task {
-        // broken creep! idle until the end of time
+    fn find_task(&self, _store: &Store) -> Task {
+        // broken creep, name didn't parse! doom crep idle until the end of time
         Task::IdleUntil(u32::MAX)
     }
 }
@@ -275,9 +287,10 @@ pub fn run_workers(shard_state: &mut ShardState) {
             }
             None => {
                 // no task in queue, let's find one for next tick (even if it's just to go idle)
+                // include the worker's store so that it can be evaluated, too
                 worker_state
                     .task_queue
-                    .push_back(worker_state.role.find_task())
+                    .push_back(worker_state.role.find_task(&worker_ref.store()))
             }
         }
     }

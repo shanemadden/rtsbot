@@ -1,6 +1,9 @@
-use crate::{task::Task, worker::Worker};
-use screeps::local::Position;
+use log::*;
 use serde::{Deserialize, Serialize};
+
+use screeps::{local::Position, objects::Store};
+
+use crate::{game, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {
@@ -9,7 +12,7 @@ pub struct SourceHarvester {
 }
 
 impl Worker for SourceHarvester {
-    fn find_task(&self) -> Task {
+    fn find_task(&self, store: &Store) -> Task {
         unimplemented!()
     }
 }
