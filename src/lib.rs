@@ -9,10 +9,17 @@ mod movement;
 mod task;
 mod worker;
 
+// tunable important numbers for the bot, in one place for convenience
 mod constants {
-    pub const HIGH_CPU_THRESHOLD: f64 = 300.;
+    // won't do pathing for moving creeps if CPU is above this number
+    pub const HIGH_CPU_THRESHOLD: f64 = 250.;
+    // won't do pathing for moving creeps if bucket is below this number
     pub const LOW_BUCKET_THRESHOLD: i32 = 1_000;
+    // consider creeps to be stuck and get them a new path after this many ticks
     pub const STUCK_REPATH_THRESHOLD: u8 = 10;
+    // limits for pathfinder calls
+    pub const MAX_OPS: u32 = 100_000;
+    pub const MAX_ROOMS: u8 = 64;
 }
 
 // add wasm_bindgen to any function you would like to expose for call from js

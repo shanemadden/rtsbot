@@ -1,7 +1,14 @@
 use log::*;
 use std::collections::HashMap;
 
-use screeps::{game, Direction, Position};
+use screeps::{
+    constants::{Direction, StructureType},
+    enums::StructureObject,
+    game, find,
+    local::{LocalCostMatrix, Position, RoomName},
+    pathfinder::{MultiRoomCostResult, SearchOptions},
+    prelude::*,
+};
 
 use crate::{
     constants::*,
@@ -26,7 +33,7 @@ pub enum MovementProfile {
 #[derive(Eq, PartialEq, Hash, Debug, Clone, Copy)]
 pub struct MovementGoal {
     pub goal_pos: Position,
-    pub goal_range: u8,
+    pub goal_range: u32,
     pub profile: MovementProfile,
     pub avoid_creeps: bool,
 }
@@ -107,9 +114,347 @@ impl WorkerReference {
     }
 }
 
+fn callback_standard(room_name: RoomName) -> MultiRoomCostResult {
+    let mut new_matrix = LocalCostMatrix::new();
+    match screeps::game::rooms().get(room_name) {
+        Some(room) => {
+            for structure in room.find(find::STRUCTURES, None) {
+                let pos = structure.pos();
+                match structure {
+                    // ignore roads for creeps not needing 'em
+                    StructureObject::StructureRoad(_) => {},
+                    // containers walkable
+                    StructureObject::StructureContainer(_) => {},
+                    StructureObject::StructureWall(_) => {
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                    StructureObject::StructureRampart(rampart) => {
+                        // we could check for and path across public ramparts
+                        // (and need to do so if we want to enhance this bot to be able
+                        // to cross an ally's public ramparts - but for now, simply don't trust 'em
+                        if !rampart.my() {
+                            new_matrix.set(pos.xy(), 0xff);
+                        }
+                    },
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+
+            for csite in room.find(find::MY_CONSTRUCTION_SITES, None) {
+                let pos = csite.pos();
+                match csite.structure_type() {
+                    // walkable structure types
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+        }
+        // can't see the room; terrain matrix is fine
+        None => {}
+    }
+    MultiRoomCostResult::CostMatrix(new_matrix.into())
+}
+
+fn callback_roads(room_name: RoomName) -> MultiRoomCostResult {
+    let mut new_matrix = LocalCostMatrix::new();
+    match screeps::game::rooms().get(room_name) {
+        Some(room) => {
+            for structure in room.find(find::STRUCTURES, None) {
+                let pos = structure.pos();
+                match structure {
+                    StructureObject::StructureRoad(_) => {
+                        if new_matrix.get(pos.xy()) == 0 {
+                            new_matrix.set(pos.xy(), 0x01);
+                        }
+                    },
+                    // containers walkable
+                    StructureObject::StructureContainer(_) => {}
+                    StructureObject::StructureWall(_) => {
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                    StructureObject::StructureRampart(rampart) => {
+                        // we could check for and path across public ramparts
+                        // (and need to do so if we want to enhance this bot to be able
+                        // to cross an ally's public ramparts - but for now, simply don't trust 'em
+                        if !rampart.my() {
+                            new_matrix.set(pos.xy(), 0xff);
+                        }
+                    },
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+
+            for csite in room.find(find::MY_CONSTRUCTION_SITES, None) {
+                let pos = csite.pos();
+                match csite.structure_type() {
+                    // walkable structure types
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+        }
+        // can't see the room; terrain matrix is fine
+        None => {}
+    }
+    MultiRoomCostResult::CostMatrix(new_matrix.into())
+}
+
+
+fn callback_standard_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
+    let mut new_matrix = LocalCostMatrix::new();
+    match screeps::game::rooms().get(room_name) {
+        Some(room) => {
+            for structure in room.find(find::STRUCTURES, None) {
+                let pos = structure.pos();
+                match structure {
+                    // ignore roads for creeps not needing 'em
+                    StructureObject::StructureRoad(_) => {},
+                    // containers walkable
+                    StructureObject::StructureContainer(_) => {},
+                    StructureObject::StructureWall(_) => {
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                    StructureObject::StructureRampart(rampart) => {
+                        // we could check for and path across public ramparts
+                        // (and need to do so if we want to enhance this bot to be able
+                        // to cross an ally's public ramparts - but for now, simply don't trust 'em
+                        if !rampart.my() {
+                            new_matrix.set(pos.xy(), 0xff);
+                        }
+                    },
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+
+            for creep in room.find(find::CREEPS, None) {
+                let pos = creep.pos();
+                new_matrix.set(pos.xy(), 0x20);
+            }
+
+            for csite in room.find(find::MY_CONSTRUCTION_SITES, None) {
+                let pos = csite.pos();
+                match csite.structure_type() {
+                    // walkable structure types
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+        }
+        // can't see the room; terrain matrix is fine
+        None => {}
+    }
+    MultiRoomCostResult::CostMatrix(new_matrix.into())
+}
+
+fn callback_roads_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
+    let mut new_matrix = LocalCostMatrix::new();
+    match screeps::game::rooms().get(room_name) {
+        Some(room) => {
+            for structure in room.find(find::STRUCTURES, None) {
+                let pos = structure.pos();
+                match structure {
+                    StructureObject::StructureRoad(_) => {
+                        if new_matrix.get(pos.xy()) == 0 {
+                            new_matrix.set(pos.xy(), 0x01);
+                        }
+                    },
+                    // containers walkable
+                    StructureObject::StructureContainer(_) => {}
+                    StructureObject::StructureWall(_) => {
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                    StructureObject::StructureRampart(rampart) => {
+                        // we could check for and path across public ramparts
+                        // (and need to do so if we want to enhance this bot to be able
+                        // to cross an ally's public ramparts - but for now, simply don't trust 'em
+                        if !rampart.my() {
+                            new_matrix.set(pos.xy(), 0xff);
+                        }
+                    },
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+
+            for creep in room.find(find::CREEPS, None) {
+                let pos = creep.pos();
+                new_matrix.set(pos.xy(), 0x20);
+            }
+
+
+            for csite in room.find(find::MY_CONSTRUCTION_SITES, None) {
+                let pos = csite.pos();
+                match csite.structure_type() {
+                    // walkable structure types
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    _ => {
+                        // other structures, not walkable
+                        new_matrix.set(pos.xy(), 0xff);
+                    },
+                }
+            }
+        }
+        // can't see the room; terrain matrix is fine
+        None => {}
+    }
+    MultiRoomCostResult::CostMatrix(new_matrix.into())
+}
+
+
 impl MovementGoal {
-    fn find_path_to(&self) -> PathState {
-        unimplemented!();
+    fn find_path_to(&self, from_position: Position) -> PathState {
+        let search_result = if self.avoid_creeps {
+            match self.profile {
+                // creep that moves at full speed over swamp, treat swamps as the same as plains
+                MovementProfile::SwampFiveToOne => {
+                    let options = SearchOptions::new(callback_standard)
+                        .max_ops(MAX_OPS)
+                        .max_rooms(MAX_ROOMS)
+                        .swamp_cost(1)
+                        .heuristic_weight(1.0);
+                    screeps::pathfinder::search(
+                        from_position,
+                        self.goal_pos,
+                        self.goal_range,
+                        Some(options),
+                    )
+                },
+                MovementProfile::PlainsOneToOne => {
+                    let options = SearchOptions::new(callback_standard)
+                        .max_ops(MAX_OPS)
+                        .max_rooms(MAX_ROOMS)
+                        .heuristic_weight(1.0);
+                    screeps::pathfinder::search(
+                        from_position,
+                        self.goal_pos,
+                        self.goal_range,
+                        Some(options),
+                    )
+                },
+                // double the cost of swamps and plains to allow roads to be lowest
+                MovementProfile::RoadsOneToTwo => {
+                    let options = SearchOptions::new(callback_roads)
+                        .max_ops(MAX_OPS)
+                        .max_rooms(MAX_ROOMS)
+                        .plain_cost(2)
+                        .swamp_cost(10)
+                        .heuristic_weight(1.0);
+                    screeps::pathfinder::search(
+                        from_position,
+                        self.goal_pos,
+                        self.goal_range,
+                        Some(options),
+                    )
+                },
+            }
+        } else {
+            match self.profile {
+                // creep that moves at full speed over swamp, treat swamps as the same as plains
+                MovementProfile::SwampFiveToOne => {
+                    let options = SearchOptions::new(callback_standard_avoiding_creeps)
+                        .max_ops(MAX_OPS)
+                        .max_rooms(MAX_ROOMS)
+                        .swamp_cost(1)
+                        .heuristic_weight(1.0);
+                    screeps::pathfinder::search(
+                        from_position,
+                        self.goal_pos,
+                        self.goal_range,
+                        Some(options),
+                    )
+                },
+                MovementProfile::PlainsOneToOne => {
+                    let options = SearchOptions::new(callback_standard_avoiding_creeps)
+                        .max_ops(MAX_OPS)
+                        .max_rooms(MAX_ROOMS)
+                        .heuristic_weight(1.0);
+                    screeps::pathfinder::search(
+                        from_position,
+                        self.goal_pos,
+                        self.goal_range,
+                        Some(options),
+                    )
+                },
+                // double the cost of swamps and plains to allow roads to be lowest
+                MovementProfile::RoadsOneToTwo => {
+                    let options = SearchOptions::new(callback_roads_avoiding_creeps)
+                        .max_ops(MAX_OPS)
+                        .max_rooms(MAX_ROOMS)
+                        .plain_cost(2)
+                        .swamp_cost(10)
+                        .heuristic_weight(1.0);
+                    screeps::pathfinder::search(
+                        from_position,
+                        self.goal_pos,
+                        self.goal_range,
+                        Some(options),
+                    )
+                },
+            }
+        };
+
+        if search_result.incomplete() {
+            warn!(
+                "incomplete search! {} {} {}",
+                search_result.ops(),
+                search_result.cost(),
+                self.goal_pos
+            );
+        }
+        let positions = search_result.path();
+        let mut steps = vec![];
+
+        let mut cursor_pos = from_position;
+        for pos in positions {
+            // skip storing this step if it's just a room boundary change
+            // that'll happen automatically thanks to the edge tile
+            if pos.room_name() == cursor_pos.room_name() {
+                match pos.get_direction_to(cursor_pos) {
+                    Some(v) => {
+                        // store the inverse of the direction to cursor_pos,
+                        // since it's earlier in the path
+                        let v = -v;
+                        steps.push(v);
+                    }
+                    None => {
+                        warn!("direction failure?");
+                        break;
+                    }
+                }
+            }
+            cursor_pos = pos;
+        }
+
+        PathState {
+            goal: *self,
+            stuck_count: 0,
+            last_position: from_position,
+            // in the rare case we got a zero-step incomplete path, just
+            // mark top as the direction we're moving; the path will just fail next tick
+            next_direction: *steps.get(0).unwrap_or(&Direction::Top),
+            path: steps,
+            path_progress: 0,
+        }
     }
 }
 
@@ -192,7 +537,7 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
 
                         // if we need to path and we're in a CPU state to do it, do so
                         if path_needed && !cpu_critical {
-                            let path_state = movement_goal.find_path_to();
+                            let path_state = movement_goal.find_path_to(position);
                             worker_state.path_state = worker_reference.move_with_path(
                                 path_state,
                                 position,
