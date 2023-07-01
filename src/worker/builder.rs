@@ -1,7 +1,14 @@
 use log::*;
 use serde::{Deserialize, Serialize};
 
-use screeps::{prelude::*, enums::StructureObject, game, constants::{find, ResourceType}, local::RoomName, objects::{Store, Room}};
+use screeps::{
+    constants::{find, ResourceType},
+    enums::StructureObject,
+    game,
+    local::RoomName,
+    objects::{Room, Store},
+    prelude::*,
+};
 
 use crate::{constants::*, task::Task, worker::Worker};
 
@@ -11,7 +18,7 @@ pub struct Builder {
     pub home_room: RoomName,
     #[serde(rename = "i")]
     pub id: u8,
-    // maximum hits to repair structures to in this room
+    // maximum hits to repair structures to
     #[serde(rename = "w")]
     pub repair_watermark: u32,
 }
@@ -50,7 +57,7 @@ fn find_build_or_repair_task(room: &Room, repair_watermark: u32) -> Task {
             // if the hits are below our 'watermark' to repair to
             // as well as less than half of this struture's max, repair!
             if hits < repair_watermark && hits * 2 < hits_max {
-                return Task::Repair(structure.id())
+                return Task::Repair(structure.id());
             }
         }
     }
@@ -58,7 +65,7 @@ fn find_build_or_repair_task(room: &Room, repair_watermark: u32) -> Task {
     // look for construction tasks next
     for construction_site in room.find(find::MY_CONSTRUCTION_SITES, None) {
         // we can unwrap this id because we know the room the site is in must be visible
-        return Task::Build(construction_site.try_id().unwrap())
+        return Task::Build(construction_site.try_id().unwrap());
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)
@@ -67,12 +74,14 @@ fn find_build_or_repair_task(room: &Room, repair_watermark: u32) -> Task {
 fn find_energy_or_source(room: &Room) -> Task {
     // check for energy on the ground of sufficient quantity to care about
     for resource in room.find(find::DROPPED_RESOURCES, None) {
-        if resource.resource_type() == ResourceType::Energy && resource.amount() >= ENERGY_PICKUP_THRESHOLD {
-            return Task::TakeFromResource(resource.id())
+        if resource.resource_type() == ResourceType::Energy
+            && resource.amount() >= BUILDER_ENERGY_PICKUP_THRESHOLD
+        {
+            return Task::TakeFromResource(resource.id());
         }
     }
 
-    // check structures - containers and termainals only, don't want
+    // check structures - filtering for certain types, don't want
     // to have these taking from spawns or extensions!
     for structure in room.find(find::STRUCTURES, None) {
         let store = match &structure {
@@ -81,18 +90,19 @@ fn find_energy_or_source(room: &Room) -> Task {
             StructureObject::StructureTerminal(o) => o.store(),
             _ => {
                 // we don't want to look at this!
-                continue
+                continue;
             }
         };
 
-        if store.get_used_capacity(Some(ResourceType::Energy)) >= ENERGY_WITHDRAW_THRESHOLD {
-            return Task::TakeFromStructure(structure.as_structure().id(), ResourceType::Energy)
+        if store.get_used_capacity(Some(ResourceType::Energy)) >= BUILDER_ENERGY_WITHDRAW_THRESHOLD
+        {
+            return Task::TakeFromStructure(structure.as_structure().id(), ResourceType::Energy);
         }
     }
 
     // look for sources with energy we can harvest as a last resort
     for source in room.find(find::SOURCES_ACTIVE, None) {
-        return Task::HarvestEnergy(source.id())
+        return Task::HarvestEnergy(source.id());
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)

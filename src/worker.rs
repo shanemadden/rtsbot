@@ -9,7 +9,7 @@ use screeps::{
     enums::StructureObject,
     game,
     local::{ObjectId, Position},
-    objects::{Creep, StructureSpawn, StructureTower, Store},
+    objects::{Creep, Store, StructureSpawn, StructureTower},
     prelude::*,
 };
 

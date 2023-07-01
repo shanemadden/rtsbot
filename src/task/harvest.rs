@@ -1,10 +1,5 @@
 use log::*;
-use screeps::{
-    constants::ErrorCode,
-    local::ObjectId,
-    objects::Source,
-    prelude::*,
-};
+use screeps::{constants::ErrorCode, local::ObjectId, objects::Source, prelude::*};
 
 use crate::{
     movement::{MovementGoal, MovementProfile},
