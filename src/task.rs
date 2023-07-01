@@ -1,8 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use screeps::{constants::ResourceType, game, local::ObjectId, objects::*};
+use screeps::{
+    constants::ResourceType,
+    game,
+    local::{ObjectId, Position},
+    objects::*,
+};
 
-use crate::{movement::MovementGoal, worker::WorkerReference};
+use crate::{
+    movement::{MovementGoal, MovementProfile},
+    worker::WorkerReference,
+};
 
 mod build;
 mod harvest;
@@ -19,6 +27,7 @@ pub enum TaskResult {
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum Task {
     IdleUntil(u32),
+    MoveToPosition(Position, u32),
     HarvestEnergy(ObjectId<Source>),
     Build(ObjectId<ConstructionSite>),
     Repair(ObjectId<Structure>),
@@ -37,6 +46,18 @@ impl Task {
                     TaskResult::Complete
                 } else {
                     TaskResult::StillWorking(None)
+                }
+            }
+            Task::MoveToPosition(position, range) => {
+                if worker.pos().get_range_to(*position) <= *range {
+                    TaskResult::Complete
+                } else {
+                    TaskResult::StillWorking(Some(MovementGoal {
+                        goal_pos: *position,
+                        goal_range: *range,
+                        profile: MovementProfile::RoadsOneToTwo,
+                        avoid_creeps: false,
+                    }))
                 }
             }
             // remaining task types are more complex and have handlers

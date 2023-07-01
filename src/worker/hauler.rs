@@ -24,9 +24,9 @@ impl Worker for Hauler {
         match game::rooms().get(self.home_room) {
             Some(room) => {
                 if store.get_used_capacity(Some(ResourceType::Energy)) > 0 {
-                    find_energy(&room)
-                } else {
                     find_delivery_target(&room)
+                } else {
+                    find_energy(&room)
                 }
             }
             None => {
@@ -77,8 +77,8 @@ fn find_delivery_target(room: &Room) -> Task {
 
     for structure in room.find(find::STRUCTURES, None) {
         let (store, structure) = match structure {
-            // for the three object types we care about, snag their store then cast them
-            // right back to StructureObject
+            // for the three object types that are important to fill, snag their store then cast
+            // them right back to StructureObject
             StructureObject::StructureSpawn(o) => (o.store(), StructureObject::from(o)),
             StructureObject::StructureExtension(o) => (o.store(), StructureObject::from(o)),
             StructureObject::StructureTower(o) => (o.store(), StructureObject::from(o)),

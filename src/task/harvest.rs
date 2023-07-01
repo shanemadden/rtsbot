@@ -1,5 +1,5 @@
 use log::*;
-use screeps::{game, constants::ErrorCode, local::ObjectId, objects::Source, prelude::*};
+use screeps::{constants::ErrorCode, game, local::ObjectId, objects::Source, prelude::*};
 
 use crate::{
     movement::{MovementGoal, MovementProfile},
@@ -21,7 +21,7 @@ pub fn harvest_energy(worker: &WorkerReference, target: &ObjectId<Source>) -> Ta
                         } else {
                             TaskResult::StillWorking(None)
                         }
-                    },
+                    }
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
