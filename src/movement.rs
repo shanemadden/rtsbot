@@ -1,9 +1,12 @@
-use std::collections::HashMap;
 use log::*;
+use std::collections::HashMap;
 
 use screeps::{game, Direction, Position};
 
-use crate::{ShardState, worker::{Worker, WorkerReference}};
+use crate::{
+    worker::{Worker, WorkerReference},
+    ShardState,
+};
 
 // enum for the different speeds available to creeps
 #[derive(Eq, PartialEq, Hash, Debug, Clone, Copy)]
@@ -56,17 +59,20 @@ impl PathState {
             self.stuck_count += 1;
         } else {
             // we're not in the right spot. If we're in a different position than we were
-            // last tick, something weird is going on (possibly stuck on an exit tile or portal) - 
+            // last tick, something weird is going on (possibly stuck on an exit tile or portal) -
             // we want to repath in this case, so send the stuck count way up to trigger that
             self.stuck_count = u8::MAX;
         }
     }
 }
 
-
-
 impl WorkerReference {
-    fn move_with_path(&self, mut path_state: PathState, current_position: Position, moving_creeps: &mut HashMap<Position, Direction>) -> Option<PathState> {
+    fn move_with_path(
+        &self,
+        mut path_state: PathState,
+        current_position: Position,
+        moving_creeps: &mut HashMap<Position, Direction>,
+    ) -> Option<PathState> {
         match path_state.path.get(path_state.path_progress) {
             Some(direction) => match self {
                 WorkerReference::Creep(creep) => {
@@ -79,11 +85,11 @@ impl WorkerReference {
                     // at the target position can infer which direction they should move to swap
                     moving_creeps.insert(current_position + *direction, *direction);
                     Some(path_state)
-                },
+                }
                 _ => {
                     warn!("can't move worker in move_with_path?");
                     None
-                },
+                }
             },
             None => None,
         }
@@ -111,10 +117,16 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
     let tick_cpu = game::cpu::get_used();
     let bucket_cpu = game::cpu::bucket();
     let cpu_critical = if tick_cpu > crate::constants::HIGH_CPU_THRESHOLD {
-        warn!("CPU usage high, will skip finding fresh paths: {}", tick_cpu);
+        warn!(
+            "CPU usage high, will skip finding fresh paths: {}",
+            tick_cpu
+        );
         true
     } else if bucket_cpu < crate::constants::LOW_BUCKET_THRESHOLD {
-        warn!("CPU bucket low, will skip finding fresh paths: {}", bucket_cpu);
+        warn!(
+            "CPU bucket low, will skip finding fresh paths: {}",
+            bucket_cpu
+        );
         true
     } else {
         false
@@ -133,35 +145,49 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
                 // it can move - check if it has somewhere to be, and mark it as idle if not
                 if let Some(movement_goal) = worker_state.movement_goal.take() {
                     // we have a goal; first check if it's met
-                    if position.get_range_to(movement_goal.goal_pos) <= movement_goal.goal_range as u32 {
+                    if position.get_range_to(movement_goal.goal_pos)
+                        <= movement_goal.goal_range as u32
+                    {
                         // goal is met! unset the path_state if there is one and idle
                         worker_state.path_state = None;
                         idle_creeps.insert(position, worker_reference);
                     } else {
                         // goal isn't met - let's see if there's a cached path
-                        let path_needed = if let Some(mut path_state) = worker_state.path_state.take() {
-                            // first call the function that updates the current position (or the stuck count)
-                            path_state.check_if_moved_and_update_pos(position);
+                        let path_needed =
+                            if let Some(mut path_state) = worker_state.path_state.take() {
+                                // first call the function that updates the current position (or the stuck count)
+                                path_state.check_if_moved_and_update_pos(position);
 
-                            if path_state.goal == movement_goal && path_state.stuck_count <= crate::constants::STUCK_REPATH_THRESHOLD {
-                                // still has the same goal as the cached path; we're ok
-                                // to simply move, retaining the path unless it's not returned
-                                worker_state.path_state = worker_reference.move_with_path(path_state, position, &mut moving_creeps);
-                                false
+                                if path_state.goal == movement_goal
+                                    && path_state.stuck_count
+                                        <= crate::constants::STUCK_REPATH_THRESHOLD
+                                {
+                                    // still has the same goal as the cached path; we're ok
+                                    // to simply move, retaining the path unless it's not returned
+                                    worker_state.path_state = worker_reference.move_with_path(
+                                        path_state,
+                                        position,
+                                        &mut moving_creeps,
+                                    );
+                                    false
+                                } else {
+                                    // the goal has changed or we're stuck - mark pathing as needed and
+                                    // ditch this state
+                                    true
+                                }
                             } else {
-                                // the goal has changed or we're stuck - mark pathing as needed and
-                                // ditch this state
+                                // no cached path found, mark as needed
                                 true
-                            }
-                        } else {
-                            // no cached path found, mark as needed
-                            true
-                        };
+                            };
 
                         // if we need to path and we're in a CPU state to do it, do so
                         if path_needed && !cpu_critical {
                             let mut path_state = movement_goal.find_path_to();
-                            worker_state.path_state = worker_reference.move_with_path(path_state, position, &mut moving_creeps);
+                            worker_state.path_state = worker_reference.move_with_path(
+                                path_state,
+                                position,
+                                &mut moving_creeps,
+                            );
                         }
 
                         // put the goal back that we took, since the goal isn't yet met
@@ -179,5 +205,4 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
     }
 
     // look for idle creeps where we actively have creeps saying they intend to move
-
 }

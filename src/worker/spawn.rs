@@ -1,4 +1,4 @@
-use crate::{worker::Worker, task::Task};
+use crate::{task::Task, worker::Worker};
 use screeps::local::RoomName;
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ impl Worker for Spawn {
     fn find_task(&self) -> Task {
         unimplemented!()
     }
-    
+
     fn can_move(&self) -> bool {
         false
     }

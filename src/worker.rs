@@ -8,7 +8,7 @@ use screeps::{
     constants::find,
     enums::StructureObject,
     game,
-    local::{Position, ObjectId},
+    local::{ObjectId, Position},
     objects::{Creep, StructureSpawn, StructureTower},
     prelude::*,
 };

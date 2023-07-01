@@ -1,4 +1,4 @@
-use crate::{worker::Worker, task::Task};
+use crate::{task::Task, worker::Worker};
 use screeps::local::RoomName;
 use serde::{Deserialize, Serialize};
 
