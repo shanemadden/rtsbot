@@ -58,7 +58,7 @@ impl PathState {
         if current_position == (self.last_position + self.next_direction) {
             // we've moved as intended (yay); let's update the last good position..
             self.last_position = current_position;
-            // ..and bump the cursor for the next move
+            // ..and bump the cursor for the next move..
             self.path_progress += 1;
             // ..and reset the stuck count
             self.stuck_count = 0;
@@ -68,7 +68,7 @@ impl PathState {
         } else {
             // we're not in the right spot. If we're in a different position than we were
             // last tick, something weird is going on (possibly stuck on an exit tile or portal) -
-            // we want to repath in this case, so send the stuck count way up to trigger that
+            // we want to repath in this case, so send the stuck count way up to trigger repathing
             self.stuck_count = u8::MAX;
         }
     }
