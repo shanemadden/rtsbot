@@ -71,6 +71,13 @@ impl WorkerReference {
             WorkerReference::Tower(o) => o.pos(),
         }
     }
+
+    pub fn fatigue(&self) -> u32 {
+        match self {
+            WorkerReference::Creep(o) => o.fatigue(),
+            _ => 0,
+        }
+    }
 }
 
 // trait to declare the functions that each role needs to implement
