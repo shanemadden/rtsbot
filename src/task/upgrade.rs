@@ -15,9 +15,8 @@ pub fn upgrade(worker: &WorkerReference, target: &ObjectId<StructureController>)
                 Err(e) => match e {
                     ErrorCode::NotInRange => {
                         let move_goal = MovementGoal {
-                            goal: controller.pos().into(),
+                            goal_pos: controller.pos().into(),
                             goal_range: 1,
-                            priority: 1,
                             profile: MovementProfile::RoadsOneToTwo,
                             avoid_creeps: false,
                         };

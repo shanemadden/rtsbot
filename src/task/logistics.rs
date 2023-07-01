@@ -22,9 +22,8 @@ pub fn take_from_resource(worker: &WorkerReference, target: &ObjectId<Resource>)
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
-                                goal: resource.pos().into(),
+                                goal_pos: resource.pos().into(),
                                 goal_range: 1,
-                                priority: 1,
                                 profile: MovementProfile::RoadsOneToTwo,
                                 avoid_creeps: false,
                             };
@@ -62,9 +61,8 @@ pub fn take_from_structure(
                         Err(e) => match e {
                             ErrorCode::NotInRange => {
                                 let move_goal = MovementGoal {
-                                    goal: structure_object.pos().into(),
+                                    goal_pos: structure_object.pos().into(),
                                     goal_range: 1,
-                                    priority: 1,
                                     profile: MovementProfile::RoadsOneToTwo,
                                     avoid_creeps: false,
                                 };
@@ -108,9 +106,8 @@ pub fn deliver_to_structure(
                         Err(e) => match e {
                             ErrorCode::NotInRange => {
                                 let move_goal = MovementGoal {
-                                    goal: structure_object.pos().into(),
+                                    goal_pos: structure_object.pos().into(),
                                     goal_range: 1,
-                                    priority: 1,
                                     profile: MovementProfile::RoadsOneToTwo,
                                     avoid_creeps: false,
                                 };

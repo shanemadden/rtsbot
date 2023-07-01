@@ -9,6 +9,12 @@ mod movement;
 mod task;
 mod worker;
 
+mod constants {
+    pub const HIGH_CPU_THRESHOLD: f64 = 300.;
+    pub const LOW_BUCKET_THRESHOLD: i32 = 1_000;
+    pub const STUCK_REPATH_THRESHOLD: u8 = 10;
+}
+
 // add wasm_bindgen to any function you would like to expose for call from js
 #[wasm_bindgen]
 pub fn setup() {

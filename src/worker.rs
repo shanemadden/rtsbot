@@ -8,7 +8,7 @@ use screeps::{
     constants::find,
     enums::StructureObject,
     game,
-    local::ObjectId,
+    local::{Position, ObjectId},
     objects::{Creep, StructureSpawn, StructureTower},
     prelude::*,
 };
@@ -61,6 +61,16 @@ pub enum WorkerReference {
     Creep(Creep),
     Spawn(StructureSpawn),
     Tower(StructureTower),
+}
+
+impl WorkerReference {
+    pub fn pos(&self) -> Position {
+        match self {
+            WorkerReference::Creep(o) => o.pos(),
+            WorkerReference::Spawn(o) => o.pos(),
+            WorkerReference::Tower(o) => o.pos(),
+        }
+    }
 }
 
 // trait to declare the functions that each role needs to implement

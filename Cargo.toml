@@ -39,3 +39,5 @@ wasm-opt = false
 
 [features]
 default = []
+
+# feature ideas -- path visualizations, sim support

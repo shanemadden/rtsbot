@@ -15,9 +15,8 @@ pub fn repair(worker: &WorkerReference, target: &ObjectId<Structure>) -> TaskRes
                 Err(e) => match e {
                     ErrorCode::NotInRange => {
                         let move_goal = MovementGoal {
-                            goal: target_structure.pos().into(),
+                            goal_pos: target_structure.pos().into(),
                             goal_range: 1,
-                            priority: 1,
                             profile: MovementProfile::RoadsOneToTwo,
                             avoid_creeps: false,
                         };

@@ -16,9 +16,8 @@ pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> T
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
-                                goal: construction_site.pos().into(),
+                                goal_pos: construction_site.pos().into(),
                                 goal_range: 1,
-                                priority: 1,
                                 profile: MovementProfile::RoadsOneToTwo,
                                 avoid_creeps: false,
                             };
