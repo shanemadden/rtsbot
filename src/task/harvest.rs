@@ -1,5 +1,5 @@
 use log::*;
-use screeps::{constants::ErrorCode, local::ObjectId, objects::Source, prelude::*};
+use screeps::{game, constants::ErrorCode, local::ObjectId, objects::Source, prelude::*};
 
 use crate::{
     movement::{MovementGoal, MovementProfile},
@@ -12,7 +12,16 @@ pub fn harvest_energy(worker: &WorkerReference, target: &ObjectId<Source>) -> Ta
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(source) => {
                 match creep.harvest(&source) {
-                    Ok(()) => TaskResult::Complete,
+                    Ok(()) => {
+                        // harvest tasks don't fail when we're full, but we don't want builder
+                        // creeps that get harvest tasks to sit there dumping energy on the floor
+                        // bail from the task every 10 ticks; dedicated harvests will find it again
+                        if game::time() % 10 == 0 {
+                            TaskResult::Complete
+                        } else {
+                            TaskResult::StillWorking(None)
+                        }
+                    },
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
