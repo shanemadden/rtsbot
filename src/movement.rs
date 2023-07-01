@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use screeps::{
     constants::{Direction, StructureType},
     enums::StructureObject,
-    game, find,
+    find, game,
     local::{LocalCostMatrix, Position, RoomName},
     pathfinder::{MultiRoomCostResult, SearchOptions},
     prelude::*,
@@ -122,12 +122,12 @@ fn callback_standard(room_name: RoomName) -> MultiRoomCostResult {
                 let pos = structure.pos();
                 match structure {
                     // ignore roads for creeps not needing 'em
-                    StructureObject::StructureRoad(_) => {},
+                    StructureObject::StructureRoad(_) => {}
                     // containers walkable
-                    StructureObject::StructureContainer(_) => {},
+                    StructureObject::StructureContainer(_) => {}
                     StructureObject::StructureWall(_) => {
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                     StructureObject::StructureRampart(rampart) => {
                         // we could check for and path across public ramparts
                         // (and need to do so if we want to enhance this bot to be able
@@ -135,11 +135,11 @@ fn callback_standard(room_name: RoomName) -> MultiRoomCostResult {
                         if !rampart.my() {
                             new_matrix.set(pos.xy(), 0xff);
                         }
-                    },
+                    }
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
 
@@ -147,11 +147,11 @@ fn callback_standard(room_name: RoomName) -> MultiRoomCostResult {
                 let pos = csite.pos();
                 match csite.structure_type() {
                     // walkable structure types
-                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {}
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
         }
@@ -172,12 +172,12 @@ fn callback_roads(room_name: RoomName) -> MultiRoomCostResult {
                         if new_matrix.get(pos.xy()) == 0 {
                             new_matrix.set(pos.xy(), 0x01);
                         }
-                    },
+                    }
                     // containers walkable
                     StructureObject::StructureContainer(_) => {}
                     StructureObject::StructureWall(_) => {
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                     StructureObject::StructureRampart(rampart) => {
                         // we could check for and path across public ramparts
                         // (and need to do so if we want to enhance this bot to be able
@@ -185,11 +185,11 @@ fn callback_roads(room_name: RoomName) -> MultiRoomCostResult {
                         if !rampart.my() {
                             new_matrix.set(pos.xy(), 0xff);
                         }
-                    },
+                    }
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
 
@@ -197,11 +197,11 @@ fn callback_roads(room_name: RoomName) -> MultiRoomCostResult {
                 let pos = csite.pos();
                 match csite.structure_type() {
                     // walkable structure types
-                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {}
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
         }
@@ -211,7 +211,6 @@ fn callback_roads(room_name: RoomName) -> MultiRoomCostResult {
     MultiRoomCostResult::CostMatrix(new_matrix.into())
 }
 
-
 fn callback_standard_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
     let mut new_matrix = LocalCostMatrix::new();
     match screeps::game::rooms().get(room_name) {
@@ -220,12 +219,12 @@ fn callback_standard_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult
                 let pos = structure.pos();
                 match structure {
                     // ignore roads for creeps not needing 'em
-                    StructureObject::StructureRoad(_) => {},
+                    StructureObject::StructureRoad(_) => {}
                     // containers walkable
-                    StructureObject::StructureContainer(_) => {},
+                    StructureObject::StructureContainer(_) => {}
                     StructureObject::StructureWall(_) => {
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                     StructureObject::StructureRampart(rampart) => {
                         // we could check for and path across public ramparts
                         // (and need to do so if we want to enhance this bot to be able
@@ -233,11 +232,11 @@ fn callback_standard_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult
                         if !rampart.my() {
                             new_matrix.set(pos.xy(), 0xff);
                         }
-                    },
+                    }
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
 
@@ -250,11 +249,11 @@ fn callback_standard_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult
                 let pos = csite.pos();
                 match csite.structure_type() {
                     // walkable structure types
-                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {}
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
         }
@@ -275,12 +274,12 @@ fn callback_roads_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
                         if new_matrix.get(pos.xy()) == 0 {
                             new_matrix.set(pos.xy(), 0x01);
                         }
-                    },
+                    }
                     // containers walkable
                     StructureObject::StructureContainer(_) => {}
                     StructureObject::StructureWall(_) => {
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                     StructureObject::StructureRampart(rampart) => {
                         // we could check for and path across public ramparts
                         // (and need to do so if we want to enhance this bot to be able
@@ -288,11 +287,11 @@ fn callback_roads_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
                         if !rampart.my() {
                             new_matrix.set(pos.xy(), 0xff);
                         }
-                    },
+                    }
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
 
@@ -301,16 +300,15 @@ fn callback_roads_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
                 new_matrix.set(pos.xy(), 0x20);
             }
 
-
             for csite in room.find(find::MY_CONSTRUCTION_SITES, None) {
                 let pos = csite.pos();
                 match csite.structure_type() {
                     // walkable structure types
-                    StructureType::Container | StructureType::Road | StructureType::Rampart => {},
+                    StructureType::Container | StructureType::Road | StructureType::Rampart => {}
                     _ => {
                         // other structures, not walkable
                         new_matrix.set(pos.xy(), 0xff);
-                    },
+                    }
                 }
             }
         }
@@ -319,7 +317,6 @@ fn callback_roads_avoiding_creeps(room_name: RoomName) -> MultiRoomCostResult {
     }
     MultiRoomCostResult::CostMatrix(new_matrix.into())
 }
-
 
 impl MovementGoal {
     fn find_path_to(&self, from_position: Position) -> PathState {
@@ -338,7 +335,7 @@ impl MovementGoal {
                         self.goal_range,
                         Some(options),
                     )
-                },
+                }
                 MovementProfile::PlainsOneToOne => {
                     let options = SearchOptions::new(callback_standard)
                         .max_ops(MAX_OPS)
@@ -350,7 +347,7 @@ impl MovementGoal {
                         self.goal_range,
                         Some(options),
                     )
-                },
+                }
                 // double the cost of swamps and plains to allow roads to be lowest
                 MovementProfile::RoadsOneToTwo => {
                     let options = SearchOptions::new(callback_roads)
@@ -365,7 +362,7 @@ impl MovementGoal {
                         self.goal_range,
                         Some(options),
                     )
-                },
+                }
             }
         } else {
             match self.profile {
@@ -382,7 +379,7 @@ impl MovementGoal {
                         self.goal_range,
                         Some(options),
                     )
-                },
+                }
                 MovementProfile::PlainsOneToOne => {
                     let options = SearchOptions::new(callback_standard_avoiding_creeps)
                         .max_ops(MAX_OPS)
@@ -394,7 +391,7 @@ impl MovementGoal {
                         self.goal_range,
                         Some(options),
                     )
-                },
+                }
                 // double the cost of swamps and plains to allow roads to be lowest
                 MovementProfile::RoadsOneToTwo => {
                     let options = SearchOptions::new(callback_roads_avoiding_creeps)
@@ -409,7 +406,7 @@ impl MovementGoal {
                         self.goal_range,
                         Some(options),
                     )
-                },
+                }
             }
         };
 
