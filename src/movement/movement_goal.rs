@@ -27,7 +27,7 @@ impl MovementGoal {
                         .max_ops(MAX_OPS)
                         .max_rooms(MAX_ROOMS)
                         .swamp_cost(1)
-                        .heuristic_weight(1.0);
+                        .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
                         self.goal_pos,
@@ -39,7 +39,7 @@ impl MovementGoal {
                     let options = SearchOptions::new(callback_standard)
                         .max_ops(MAX_OPS)
                         .max_rooms(MAX_ROOMS)
-                        .heuristic_weight(1.0);
+                        .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
                         self.goal_pos,
@@ -54,7 +54,7 @@ impl MovementGoal {
                         .max_rooms(MAX_ROOMS)
                         .plain_cost(2)
                         .swamp_cost(10)
-                        .heuristic_weight(1.0);
+                        .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
                         self.goal_pos,
@@ -71,7 +71,7 @@ impl MovementGoal {
                         .max_ops(MAX_OPS)
                         .max_rooms(MAX_ROOMS)
                         .swamp_cost(1)
-                        .heuristic_weight(1.0);
+                        .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
                         self.goal_pos,
@@ -83,7 +83,7 @@ impl MovementGoal {
                     let options = SearchOptions::new(callback_standard_avoiding_creeps)
                         .max_ops(MAX_OPS)
                         .max_rooms(MAX_ROOMS)
-                        .heuristic_weight(1.0);
+                        .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
                         self.goal_pos,
@@ -98,7 +98,7 @@ impl MovementGoal {
                         .max_rooms(MAX_ROOMS)
                         .plain_cost(2)
                         .swamp_cost(10)
-                        .heuristic_weight(1.0);
+                        .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
                         self.goal_pos,

@@ -20,6 +20,8 @@ mod constants {
     // limits for pathfinder calls
     pub const MAX_OPS: u32 = 100_000;
     pub const MAX_ROOMS: u8 = 64;
+    // default is 1.2 - but it risks non-optimal paths, so we turn it down a bit
+    pub const HEURISTIC_WEIGHT: f64 = 1.0;
     // when task finding fails, idle this long
     pub const NO_TASK_IDLE_TICKS: u32 = 5;
     // builder role considers energy for grabbing above this amount
