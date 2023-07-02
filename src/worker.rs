@@ -286,11 +286,16 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 }
             }
             None => {
-                // no task in queue, let's find one for next tick (even if it's just to go idle)
+                // no task in queue, let's find one (even if it's just to go idle)
                 // include the worker's store so that it can be evaluated, too
-                worker_state
-                    .task_queue
-                    .push_back(worker_state.role.find_task(&worker_ref.store()))
+                let new_task = worker_state.role.find_task(&worker_ref.store());
+                match new_task.run_task(&worker_ref) {
+                    TaskResult::Complete => warn!("instantly completed new task, unexpected: {:?}", new_task),
+                    TaskResult::StillWorking(optional_move_goal) => {
+                        worker_state.movement_goal = optional_move_goal;
+                        worker_state.task_queue.push_front(new_task)
+                    }
+                }
             }
         }
     }
