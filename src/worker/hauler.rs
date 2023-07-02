@@ -112,7 +112,7 @@ fn find_delivery_target(room: &Room) -> Task {
                 < TERMINAL_ENERGY_TARGET
             {
                 return Task::DeliverToStructure(
-                    <StructureTerminal as AsRef<Structure>>::as_ref(&terminal).id(),
+                    terminal.id().into_type::<Structure>(),
                     ResourceType::Energy,
                 );
             }
@@ -124,7 +124,7 @@ fn find_delivery_target(room: &Room) -> Task {
     match maybe_storage {
         Some(storage) => {
             return Task::DeliverToStructure(
-                <StructureStorage as AsRef<Structure>>::as_ref(&storage).id(),
+                storage.id().into_type::<Structure>(),
                 ResourceType::Energy,
             )
         }

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use log::*;
 use screeps::{game, RoomName};
@@ -8,6 +8,8 @@ mod logging;
 mod movement;
 mod task;
 mod worker;
+
+use worker::{WorkerId, WorkerState, WorkerRole};
 
 // tunable important numbers for the bot, in one place for convenience
 mod constants {
@@ -57,7 +59,10 @@ pub struct ShardState {
     // owned room states and spawn queues
     pub colony_state: HashMap<RoomName, ColonyState>,
     // workers and their task queues (includes creeps as well as structures)
-    pub worker_state: HashMap<worker::WorkerId, worker::WorkerState>,
+    pub worker_state: HashMap<WorkerId, WorkerState>,
+    // additionally, a HashSet<WorkerRole> where we'll mark which roles
+    // we have active workers for, allowing spawns to check which workers to create
+    pub worker_roles: HashSet<WorkerRole>,
 }
 
 impl Default for ShardState {
@@ -66,6 +71,7 @@ impl Default for ShardState {
             global_init_time: game::time(),
             colony_state: HashMap::new(),
             worker_state: HashMap::new(),
+            worker_roles: HashSet::new(),
         }
     }
 }

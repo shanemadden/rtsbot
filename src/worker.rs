@@ -185,6 +185,7 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
             .worker_state
             .entry(id)
             .and_modify(|worker_state| {
+                // worker exists!
                 // cloning the creep here so it's not moved and unavailable to the or_insert_with
                 // branch below
                 worker_state.worker_reference = Some(WorkerReference::Creep(creep.clone()))
@@ -192,14 +193,19 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
             .or_insert_with(|| {
                 let creep_name = creep.name();
                 match serde_json::from_str(&creep_name) {
-                    Ok(role) => WorkerState::new_with_role_and_reference(
-                        role,
-                        WorkerReference::Creep(creep),
-                    ),
+                    Ok(role) => {
+                        // add to hashset where we track which roles are filled by active workers
+                        shard_state.worker_roles.insert(role);
+                        // then create the state struct
+                        WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep))
+                    },
                     Err(e) => {
                         warn!("couldn't parse creep name {}: {:?}", creep_name, e);
+                        // special case, don't insert to the hashset where we track roles, since
+                        // this isn't a valid role
+                        let role = WorkerRole::Invalid(Invalid {});
                         WorkerState {
-                            role: WorkerRole::Invalid(Invalid {}),
+                            role,
                             task_queue: VecDeque::new(),
                             worker_reference: Some(WorkerReference::Creep(creep)),
                             movement_goal: None,
@@ -254,6 +260,7 @@ pub fn scan_and_register_structures(shard_state: &mut ShardState) {
 pub fn run_workers(shard_state: &mut ShardState) {
     // track which worker ids can't resolve and should be removed from the hashmap after iteration
     let mut remove_worker_ids = vec![];
+    let mut remove_worker_roles = vec![];
 
     for (worker_id, worker_state) in shard_state.worker_state.iter_mut() {
         if worker_state.worker_reference.is_none() {
@@ -265,6 +272,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 None => {
                     // couldn't resolve the worker, mark it for removal
                     remove_worker_ids.push(worker_id.clone());
+                    remove_worker_roles.push(worker_state.role);
                     continue;
                 }
             }
@@ -304,5 +312,9 @@ pub fn run_workers(shard_state: &mut ShardState) {
 
     for id in remove_worker_ids {
         shard_state.worker_state.remove(&id);
+    }
+
+    for role in remove_worker_roles {
+        shard_state.worker_roles.remove(&role);
     }
 }
