@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashSet};
 
 use enum_dispatch::enum_dispatch;
 use log::*;
@@ -98,7 +98,7 @@ impl WorkerReference {
 pub trait Worker {
     // function to be called for the worker when it has no work to do,
     // so that it can find another task (even if it's just to idle)
-    fn find_task(&self, store: &Store) -> Task;
+    fn find_task(&self, store: &Store, worker_roles: &HashSet<WorkerRole>) -> Task;
 
     // default implementation saying worker types can move
     fn can_move(&self) -> bool {
@@ -138,8 +138,8 @@ pub enum WorkerRole {
 pub struct Invalid {}
 
 impl Worker for Invalid {
-    fn find_task(&self, _store: &Store) -> Task {
-        // broken creep, name didn't parse! doom crep idle until the end of time
+    fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
+        // broken creep, name didn't parse! doom creep to idle until the end of time
         Task::IdleUntil(u32::MAX)
     }
 }
@@ -295,8 +295,8 @@ pub fn run_workers(shard_state: &mut ShardState) {
             }
             None => {
                 // no task in queue, let's find one (even if it's just to go idle)
-                // include the worker's store so that it can be evaluated, too
-                let new_task = worker_state.role.find_task(&worker_ref.store());
+                // include the worker's store and the worker role hashset
+                let new_task = worker_state.role.find_task(&worker_ref.store(), &shard_state.worker_roles);
                 match new_task.run_task(&worker_ref) {
                     TaskResult::Complete => {
                         warn!("instantly completed new task, unexpected: {:?}", new_task)

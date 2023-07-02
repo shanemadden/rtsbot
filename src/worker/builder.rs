@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +11,7 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{constants::*, task::Task, worker::Worker};
+use crate::{constants::*, task::Task, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Builder {
@@ -24,7 +25,7 @@ pub struct Builder {
 }
 
 impl Worker for Builder {
-    fn find_task(&self, store: &Store) -> Task {
+    fn find_task(&self, store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         match game::rooms().get(self.home_room) {
             Some(room) => {
                 if store.get_used_capacity(Some(ResourceType::Energy)) > 0 {

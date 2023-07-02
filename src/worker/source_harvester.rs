@@ -1,9 +1,10 @@
+use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
 
 use screeps::{constants::look, local::Position, objects::Store, prelude::*};
 
-use crate::{game, task::Task, worker::Worker};
+use crate::{game, task::Task, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {
@@ -12,7 +13,7 @@ pub struct SourceHarvester {
 }
 
 impl Worker for SourceHarvester {
-    fn find_task(&self, _store: &Store) -> Task {
+    fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         match self.source_position.look_for(look::SOURCES) {
             Ok(sources) => match sources.get(0) {
                 Some(source) => Task::HarvestEnergy(source.id()),

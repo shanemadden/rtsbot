@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 
 use screeps::{
@@ -9,7 +10,7 @@ use screeps::{
 
 use crate::{
     movement::{MovementGoal, MovementProfile},
-    worker::WorkerReference,
+    worker::{WorkerRole, WorkerReference},
 };
 
 mod build;
