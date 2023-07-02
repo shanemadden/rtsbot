@@ -30,12 +30,22 @@ mod constants {
     pub const BUILDER_ENERGY_PICKUP_THRESHOLD: u32 = 100;
     // builder role considers energy for withdraw from structures above this amount
     pub const BUILDER_ENERGY_WITHDRAW_THRESHOLD: u32 = 1_000;
+    // builder role repair maximums
+    pub const REPAIR_WATERMARK_RCL_1: u32 = 10_000;
+    pub const REPAIR_WATERMARK_RCL_2: u32 = 10_000;
+    pub const REPAIR_WATERMARK_RCL_3: u32 = 50_000;
+    pub const REPAIR_WATERMARK_RCL_4: u32 = 100_000;
+    pub const REPAIR_WATERMARK_RCL_5: u32 = 100_000;
+    pub const REPAIR_WATERMARK_RCL_6: u32 = 500_000;
+    pub const REPAIR_WATERMARK_RCL_7: u32 = 1_000_000;
+    pub const REPAIR_WATERMARK_RCL_8: u32 = 3_000_000;
     // hauler role considers energy for grabbing above this amount
     pub const HAULER_ENERGY_PICKUP_THRESHOLD: u32 = 35;
     // hauler role considers energy for withdraw from structures above this amount
     pub const HAULER_ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
     // fill terminals to this much energy
     pub const TERMINAL_ENERGY_TARGET: u32 = 50_000;
+
 }
 
 // add wasm_bindgen to any function you would like to expose for call from js this one's

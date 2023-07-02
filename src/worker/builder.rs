@@ -17,8 +17,6 @@ use crate::{constants::*, task::Task, worker::{Worker, WorkerRole}};
 pub struct Builder {
     #[serde(rename = "r")]
     pub home_room: RoomName,
-    #[serde(rename = "i")]
-    pub id: u8,
     // maximum hits to repair structures to
     #[serde(rename = "w")]
     pub repair_watermark: u32,
