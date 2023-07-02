@@ -290,7 +290,9 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 // include the worker's store so that it can be evaluated, too
                 let new_task = worker_state.role.find_task(&worker_ref.store());
                 match new_task.run_task(&worker_ref) {
-                    TaskResult::Complete => warn!("instantly completed new task, unexpected: {:?}", new_task),
+                    TaskResult::Complete => {
+                        warn!("instantly completed new task, unexpected: {:?}", new_task)
+                    }
                     TaskResult::StillWorking(optional_move_goal) => {
                         worker_state.movement_goal = optional_move_goal;
                         worker_state.task_queue.push_front(new_task)

@@ -5,7 +5,7 @@ use screeps::{
     constants::{find, ResourceType},
     enums::StructureObject,
     local::RoomName,
-    objects::{Room, Store, Structure},
+    objects::{Room, Store, Structure, StructureStorage, StructureTerminal},
     prelude::*,
 };
 
@@ -112,7 +112,7 @@ fn find_delivery_target(room: &Room) -> Task {
                 < TERMINAL_ENERGY_TARGET
             {
                 return Task::DeliverToStructure(
-                    <screeps::StructureTerminal as AsRef<Structure>>::as_ref(&terminal).id(),
+                    <StructureTerminal as AsRef<Structure>>::as_ref(&terminal).id(),
                     ResourceType::Energy,
                 );
             }
@@ -124,7 +124,7 @@ fn find_delivery_target(room: &Room) -> Task {
     match maybe_storage {
         Some(storage) => {
             return Task::DeliverToStructure(
-                <screeps::StructureStorage as AsRef<Structure>>::as_ref(&storage).id(),
+                <StructureStorage as AsRef<Structure>>::as_ref(&storage).id(),
                 ResourceType::Energy,
             )
         }
