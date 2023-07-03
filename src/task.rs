@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 
 use screeps::{
@@ -23,7 +23,12 @@ mod upgrade;
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub enum TaskResult {
     Complete,
-    StillWorking(Option<MovementGoal>),
+    StillWorking,
+    MoveMeTo(MovementGoal),
+    AddTaskToFront(Task),
+    CompleteAddTaskToFront(Task),
+    CompleteAddTaskToBack(Task),
+    DestroyWorker,
 }
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
@@ -38,29 +43,30 @@ pub enum Task {
     TakeFromStructure(ObjectId<Structure>, ResourceType),
     DeliverToStructure(ObjectId<Structure>, ResourceType),
     SpawnCreep(WorkerRole),
+    WaitToSpawn,
 }
 
 impl Task {
     pub fn run_task(&self, worker: &WorkerReference) -> TaskResult {
         match self {
-            // idle creep, let's just deal with that directly
+            // idle worker, let's just deal with that directly
             Task::IdleUntil(tick) => {
                 if game::time() >= *tick {
                     TaskResult::Complete
                 } else {
-                    TaskResult::StillWorking(None)
+                    TaskResult::StillWorking
                 }
             }
             Task::MoveToPosition(position, range) => {
                 if worker.pos().get_range_to(*position) <= *range {
                     TaskResult::Complete
                 } else {
-                    TaskResult::StillWorking(Some(MovementGoal {
+                    TaskResult::MoveMeTo(MovementGoal {
                         goal_pos: *position,
                         goal_range: *range,
                         profile: MovementProfile::RoadsOneToTwo,
                         avoid_creeps: false,
-                    }))
+                    })
                 }
             }
             // remaining task types are more complex and have handlers
@@ -72,6 +78,7 @@ impl Task {
             Task::TakeFromStructure(id, ty) => logistics::take_from_structure(worker, *id, *ty),
             Task::DeliverToStructure(id, ty) => logistics::deliver_to_structure(worker, *id, *ty),
             Task::SpawnCreep(role) => spawn::spawn_creep(worker, role),
+            Task::WaitToSpawn => spawn::wait_to_spawn(worker),
         }
     }
 }

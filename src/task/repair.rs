@@ -11,7 +11,7 @@ pub fn repair(worker: &WorkerReference, target: &ObjectId<Structure>) -> TaskRes
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(target_structure) => match creep.repair(&target_structure) {
-                Ok(()) => TaskResult::StillWorking(None),
+                Ok(()) => TaskResult::StillWorking,
                 Err(e) => match e {
                     ErrorCode::NotInRange => {
                         let move_goal = MovementGoal {
@@ -20,7 +20,7 @@ pub fn repair(worker: &WorkerReference, target: &ObjectId<Structure>) -> TaskRes
                             profile: MovementProfile::RoadsOneToTwo,
                             avoid_creeps: false,
                         };
-                        TaskResult::StillWorking(Some(move_goal))
+                        TaskResult::MoveMeTo(move_goal)
                     }
                     e => {
                         info!("repair failure: {:?}", e);

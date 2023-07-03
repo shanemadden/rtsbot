@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use screeps::{constants::Part, constants::look, local::Position, objects::{Store, StructureSpawn}, prelude::*};
 
-use crate::{game, task::{Task, TaskResult}, worker::{Worker, WorkerRole}};
+use crate::{task::{Task}, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {
@@ -23,7 +23,7 @@ impl Worker for SourceHarvester {
         }
     }
 
-    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         unimplemented!();
     }
 }

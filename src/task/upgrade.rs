@@ -11,7 +11,7 @@ pub fn upgrade(worker: &WorkerReference, target: &ObjectId<StructureController>)
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(controller) => match creep.upgrade_controller(&controller) {
-                Ok(()) => TaskResult::StillWorking(None),
+                Ok(()) => TaskResult::StillWorking,
                 Err(e) => match e {
                     ErrorCode::NotInRange => {
                         let move_goal = MovementGoal {
@@ -20,7 +20,7 @@ pub fn upgrade(worker: &WorkerReference, target: &ObjectId<StructureController>)
                             profile: MovementProfile::RoadsOneToTwo,
                             avoid_creeps: false,
                         };
-                        TaskResult::StillWorking(Some(move_goal))
+                        TaskResult::MoveMeTo(move_goal)
                     }
                     e => {
                         info!("upgrade failure: {:?}", e);

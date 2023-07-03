@@ -10,7 +10,7 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{constants::*, game, task::{Task, TaskResult}, worker::{Worker, WorkerRole}};
+use crate::{constants::*, game, task::{Task}, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Hauler {
@@ -37,7 +37,7 @@ impl Worker for Hauler {
         }
     }
 
-    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         unimplemented!();
     }
 }

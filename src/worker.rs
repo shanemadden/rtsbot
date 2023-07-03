@@ -135,6 +135,9 @@ pub enum WorkerRole {
     // when an invalid creep name is found,
     // this role is assigned so the creep can complain about it!
     Invalid(Invalid),
+    // and this special case is for all spawning creeps, which will change
+    // to their normal role after spawning
+    SpawningCreep(SpawningCreep),
 }
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
@@ -148,6 +151,19 @@ impl Worker for Invalid {
 
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         panic!("can't spawn invalid workers!")
+    }
+}
+
+#[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
+pub struct SpawningCreep {}
+
+impl Worker for SpawningCreep {
+    fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
+        Task::WaitToSpawn
+    }
+
+    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
+        panic!("can't spawn spawning workers!")
     }
 }
 
@@ -177,11 +193,6 @@ impl WorkerState {
 
 pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
     for creep in game::creeps().values() {
-        if creep.spawning() {
-            // we don't want to work with spawning creeps, skip this one!
-            continue;
-        }
-
         // this function is called at the start of tick before any tasks, so we can simply assume
         // every creep has an id; if spawning had run then id-free creeps would be a possibility.
         let id = WorkerId::Creep(creep.try_id().expect("expected creep to have id!"));
@@ -198,25 +209,32 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
                 worker_state.worker_reference = Some(WorkerReference::Creep(creep.clone()))
             })
             .or_insert_with(|| {
-                let creep_name = creep.name();
-                match serde_json::from_str(&creep_name) {
-                    Ok(role) => {
-                        // add to hashset where we track which roles are filled by active workers
-                        shard_state.worker_roles.insert(role);
-                        // then create the state struct
-                        WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep))
-                    },
-                    Err(e) => {
-                        warn!("couldn't parse creep name {}: {:?}", creep_name, e);
-                        // special case, don't insert to the hashset where we track roles, since
-                        // this isn't a valid role
-                        let role = WorkerRole::Invalid(Invalid {});
-                        WorkerState {
-                            role,
-                            task_queue: VecDeque::new(),
-                            worker_reference: Some(WorkerReference::Creep(creep)),
-                            movement_goal: None,
-                            path_state: None,
+                if creep.spawning() {
+                    // insert the stub worker, which will be destroyed once spawning is completed
+                    let role = WorkerRole::SpawningCreep(SpawningCreep {});
+                    WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep))
+                } else {
+                    // not spawning, give it the role declared in its name
+                    let creep_name = creep.name();
+                    match serde_json::from_str(&creep_name) {
+                        Ok(role) => {
+                            // add to hashset where we track which roles are filled by active workers
+                            shard_state.worker_roles.insert(role);
+                            // then create the state struct
+                            WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep))
+                        },
+                        Err(e) => {
+                            warn!("couldn't parse creep name {}: {:?}", creep_name, e);
+                            // special case, don't insert to the hashset where we track roles, since
+                            // this isn't a valid role
+                            let role = WorkerRole::Invalid(Invalid {});
+                            WorkerState {
+                                role,
+                                task_queue: VecDeque::new(),
+                                worker_reference: Some(WorkerReference::Creep(creep)),
+                                movement_goal: None,
+                                path_state: None,
+                            }
                         }
                     }
                 }
@@ -271,7 +289,8 @@ pub fn run_workers(shard_state: &mut ShardState) {
 
     for (worker_id, worker_state) in shard_state.worker_state.iter_mut() {
         if worker_state.worker_reference.is_none() {
-            // hasn't resolved yet this tick; try to resolve and continue if we can't
+            // hasn't resolved yet this tick; try to resolve and if we still can't,
+            // mark the worker for removal and skip it
             match worker_id.resolve() {
                 Some(resolved_worker) => {
                     worker_state.worker_reference = Some(resolved_worker);
@@ -294,9 +313,27 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 match task.run_task(&worker_ref) {
                     // nothing to do if complete, already popped
                     TaskResult::Complete => {}
-                    TaskResult::StillWorking(optional_move_goal) => {
-                        worker_state.movement_goal = optional_move_goal;
+                    TaskResult::StillWorking => {
+                        worker_state.task_queue.push_front(task);
+                    }
+                    TaskResult::MoveMeTo(move_goal) => {
+                        worker_state.movement_goal = Some(move_goal);
                         worker_state.task_queue.push_front(task)
+                    }
+                    TaskResult::AddTaskToFront(result_task) => {
+                        // add the result task in front after re-adding the existing task
+                        worker_state.task_queue.push_front(task);
+                        worker_state.task_queue.push_front(result_task);
+                    }
+                    TaskResult::CompleteAddTaskToFront(result_task) => {
+                        worker_state.task_queue.push_front(result_task);
+                    }
+                    TaskResult::CompleteAddTaskToBack(result_task) => {
+                        worker_state.task_queue.push_back(result_task);
+                    }
+                    TaskResult::DestroyWorker => {
+                        remove_worker_ids.push(worker_id.clone());
+                        remove_worker_roles.push(worker_state.role);
                     }
                 }
             }
@@ -308,9 +345,27 @@ pub fn run_workers(shard_state: &mut ShardState) {
                     TaskResult::Complete => {
                         warn!("instantly completed new task, unexpected: {:?}", new_task)
                     }
-                    TaskResult::StillWorking(optional_move_goal) => {
-                        worker_state.movement_goal = optional_move_goal;
+                    TaskResult::StillWorking => {
+                        worker_state.task_queue.push_front(new_task);
+                    }
+                    TaskResult::MoveMeTo(move_goal) => {
+                        worker_state.movement_goal = Some(move_goal);
                         worker_state.task_queue.push_front(new_task)
+                    }
+                    TaskResult::AddTaskToFront(result_task) => {
+                        // add the result task in front after re-adding the existing task
+                        worker_state.task_queue.push_front(new_task);
+                        worker_state.task_queue.push_front(result_task);
+                    }
+                    TaskResult::CompleteAddTaskToFront(result_task) => {
+                        worker_state.task_queue.push_front(result_task);
+                    }
+                    TaskResult::CompleteAddTaskToBack(result_task) => {
+                        worker_state.task_queue.push_back(result_task);
+                    }
+                    TaskResult::DestroyWorker => {
+                        remove_worker_ids.push(worker_id.clone());
+                        remove_worker_roles.push(worker_state.role);
                     }
                 }
             }

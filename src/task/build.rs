@@ -12,7 +12,7 @@ pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> T
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(construction_site) => {
                 match creep.build(&construction_site) {
-                    Ok(()) => TaskResult::StillWorking(None),
+                    Ok(()) => TaskResult::StillWorking,
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
@@ -21,7 +21,7 @@ pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> T
                                 profile: MovementProfile::RoadsOneToTwo,
                                 avoid_creeps: false,
                             };
-                            TaskResult::StillWorking(Some(move_goal))
+                            TaskResult::MoveMeTo(move_goal)
                         }
                         ErrorCode::InvalidTarget => {
                             // creep's standing on the construction site, and it's not walkable

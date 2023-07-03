@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use screeps::{constants::Part, local::RoomName, objects::{Store, StructureSpawn}};
 
-use crate::{game, task::{Task, TaskResult}, worker::{Worker, WorkerRole}};
+use crate::{task::{Task}, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Upgrader {
@@ -15,11 +15,11 @@ pub struct Upgrader {
 }
 
 impl Worker for Upgrader {
-    fn find_task(&self, store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
+    fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         unimplemented!()
     }
 
-    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         unimplemented!();
     }
 }

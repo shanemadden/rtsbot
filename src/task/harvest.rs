@@ -19,7 +19,7 @@ pub fn harvest_energy(worker: &WorkerReference, target: &ObjectId<Source>) -> Ta
                         if game::time() % 10 == 0 {
                             TaskResult::Complete
                         } else {
-                            TaskResult::StillWorking(None)
+                            TaskResult::StillWorking
                         }
                     }
                     Err(e) => match e {
@@ -30,7 +30,7 @@ pub fn harvest_energy(worker: &WorkerReference, target: &ObjectId<Source>) -> Ta
                                 profile: MovementProfile::RoadsOneToTwo,
                                 avoid_creeps: false,
                             };
-                            TaskResult::StillWorking(Some(move_goal))
+                            TaskResult::MoveMeTo(move_goal)
                         }
                         ErrorCode::InvalidTarget => TaskResult::Complete,
                         ErrorCode::NotEnough => TaskResult::Complete,

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use screeps::{constants::Part, constants::find, game, local::RoomName, objects::{Store, StructureSpawn}};
 
-use crate::{constants::*, task::{Task, TaskResult}, worker::*};
+use crate::{constants::*, task::{Task}, worker::*};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Spawn {
@@ -68,7 +68,7 @@ impl Worker for Spawn {
         Task::IdleUntil(u32::MAX)
     }
 
-    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         panic!("can't spawn creep for spawn")
     }
 

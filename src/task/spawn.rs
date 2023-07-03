@@ -1,8 +1,7 @@
 use log::*;
-use screeps::{constants::ErrorCode, local::ObjectId, objects::StructureController};
+use screeps::{constants::ErrorCode};
 
 use crate::{
-    movement::{MovementGoal, MovementProfile},
     task::TaskResult,
     worker::{WorkerReference, WorkerRole, Worker},
 };
@@ -18,8 +17,8 @@ pub fn spawn_creep(worker: &WorkerReference, role: &WorkerRole) -> TaskResult {
                 Err(e) => match e {
                     // already have a creep with this name
                     ErrorCode::NameExists => TaskResult::Complete,
-                    ErrorCode::Busy => TaskResult::StillWorking(None),
-                    ErrorCode::NotEnough => TaskResult::StillWorking(None),
+                    ErrorCode::Busy => TaskResult::StillWorking,
+                    ErrorCode::NotEnough => TaskResult::StillWorking,
                     e => {
                         warn!("spawn failure: {:?}", e);
                         TaskResult::Complete
@@ -27,6 +26,23 @@ pub fn spawn_creep(worker: &WorkerReference, role: &WorkerRole) -> TaskResult {
                 },
             }
         },
+        _ => panic!("unsupported worker type!"),
+    }
+}
+
+pub fn wait_to_spawn(worker: &WorkerReference) -> TaskResult {
+    match worker {
+        WorkerReference::Creep(creep) => {
+            // quick and dirty version of this is to just return working until
+            // spawned, should look at creep's location for a spawn object
+            // and do the math on how long it has til we spawn instead, idling
+            // an appropriate length of time (and maybe setting directions last tick)
+            if creep.spawning() {
+                TaskResult::StillWorking
+            } else {
+                TaskResult::DestroyWorker
+            }
+        }
         _ => panic!("unsupported worker type!"),
     }
 }

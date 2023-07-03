@@ -27,7 +27,7 @@ pub fn take_from_resource(worker: &WorkerReference, target: &ObjectId<Resource>)
                                 profile: MovementProfile::RoadsOneToTwo,
                                 avoid_creeps: false,
                             };
-                            TaskResult::StillWorking(Some(move_goal))
+                            TaskResult::MoveMeTo(move_goal)
                         }
                         ErrorCode::InvalidTarget => TaskResult::Complete,
                         ErrorCode::NotEnough => TaskResult::Complete,
@@ -66,7 +66,7 @@ pub fn take_from_structure(
                                     profile: MovementProfile::RoadsOneToTwo,
                                     avoid_creeps: false,
                                 };
-                                TaskResult::StillWorking(Some(move_goal))
+                                TaskResult::MoveMeTo(move_goal)
                             }
                             ErrorCode::InvalidTarget => TaskResult::Complete,
                             ErrorCode::NotEnough => TaskResult::Complete,
@@ -111,7 +111,7 @@ pub fn deliver_to_structure(
                                     profile: MovementProfile::RoadsOneToTwo,
                                     avoid_creeps: false,
                                 };
-                                TaskResult::StillWorking(Some(move_goal))
+                                TaskResult::MoveMeTo(move_goal)
                             }
                             ErrorCode::InvalidTarget => TaskResult::Complete,
                             ErrorCode::NotEnough => TaskResult::Complete,
