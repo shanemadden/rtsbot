@@ -10,7 +10,7 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{constants::*, game, task::{Task}, worker::{Worker, WorkerRole}};
+use crate::{constants::*, game, task::{Task}, worker::{Worker}, role::WorkerRole};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Hauler {

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use screeps::{constants::Part, constants::look, local::Position, objects::{Store, StructureSpawn}, prelude::*};
 
-use crate::{task::{Task}, worker::{Worker, WorkerRole}};
+use crate::{task::{Task}, worker::Worker, role::WorkerRole};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {

@@ -6,10 +6,14 @@ use wasm_bindgen::prelude::*;
 
 mod logging;
 mod movement;
+mod role;
 mod task;
 mod worker;
 
-use worker::{WorkerId, WorkerState, WorkerRole};
+use self::{
+    worker::{WorkerId, WorkerState},
+    role::WorkerRole,
+};
 
 // tunable important numbers for the bot, in one place for convenience
 mod constants {

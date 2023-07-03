@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use screeps::{constants::Part, constants::find, game, local::RoomName, objects::{Store, StructureSpawn}};
 
-use crate::{constants::*, task::{Task}, worker::*};
+use crate::{constants::*, task::{Task}, role::*};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Spawn {

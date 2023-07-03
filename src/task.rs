@@ -10,7 +10,8 @@ use screeps::{
 
 use crate::{
     movement::{MovementGoal, MovementProfile},
-    worker::{WorkerRole, WorkerReference},
+    worker::WorkerReference,
+    role::WorkerRole,
 };
 
 mod build;

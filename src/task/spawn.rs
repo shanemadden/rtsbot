@@ -3,7 +3,8 @@ use screeps::{constants::ErrorCode};
 
 use crate::{
     task::TaskResult,
-    worker::{WorkerReference, WorkerRole, Worker},
+    worker::{WorkerReference, Worker},
+    role::WorkerRole,
 };
 
 pub fn spawn_creep(worker: &WorkerReference, role: &WorkerRole) -> TaskResult {
