@@ -3,15 +3,15 @@ use log::*;
 use serde::{Deserialize, Serialize};
 
 use screeps::{
-    constants::{find, ResourceType},
+    constants::{find, ResourceType, Part},
     enums::StructureObject,
     game,
     local::RoomName,
-    objects::{Room, Store},
+    objects::{Room, Store, StructureSpawn},
     prelude::*,
 };
 
-use crate::{constants::*, task::Task, worker::{Worker, WorkerRole}};
+use crate::{constants::*, task::{Task, TaskResult}, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Builder {
@@ -37,6 +37,11 @@ impl Worker for Builder {
                 Task::IdleUntil(u32::MAX)
             }
         }
+    }
+
+    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+        use Part::*;
+        vec![Move, Move, Carry, Work]
     }
 }
 

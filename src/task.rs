@@ -17,6 +17,7 @@ mod build;
 mod harvest;
 mod logistics;
 mod repair;
+mod spawn;
 mod upgrade;
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
@@ -36,6 +37,7 @@ pub enum Task {
     TakeFromResource(ObjectId<Resource>),
     TakeFromStructure(ObjectId<Structure>, ResourceType),
     DeliverToStructure(ObjectId<Structure>, ResourceType),
+    SpawnCreep(WorkerRole),
 }
 
 impl Task {
@@ -69,6 +71,7 @@ impl Task {
             Task::TakeFromResource(id) => logistics::take_from_resource(worker, id),
             Task::TakeFromStructure(id, ty) => logistics::take_from_structure(worker, *id, *ty),
             Task::DeliverToStructure(id, ty) => logistics::deliver_to_structure(worker, *id, *ty),
+            Task::SpawnCreep(role) => spawn::spawn_creep(worker, role),
         }
     }
 }

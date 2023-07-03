@@ -5,7 +5,7 @@ use log::*;
 use serde::{Deserialize, Serialize};
 
 use screeps::{
-    constants::find,
+    constants::{find, Part},
     enums::StructureObject,
     game,
     local::{ObjectId, Position},
@@ -100,6 +100,9 @@ pub trait Worker {
     // so that it can find another task (even if it's just to idle)
     fn find_task(&self, store: &Store, worker_roles: &HashSet<WorkerRole>) -> Task;
 
+    // function called for spawning a creep for a worker role
+    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part>;
+
     // default implementation saying worker types can move
     fn can_move(&self) -> bool {
         true
@@ -141,6 +144,10 @@ impl Worker for Invalid {
     fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         // broken creep, name didn't parse! doom creep to idle until the end of time
         Task::IdleUntil(u32::MAX)
+    }
+
+    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
+        panic!("can't spawn invalid workers!")
     }
 }
 

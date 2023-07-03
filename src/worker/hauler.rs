@@ -3,14 +3,14 @@ use log::*;
 use serde::{Deserialize, Serialize};
 
 use screeps::{
-    constants::{find, ResourceType},
+    constants::{Part, find, ResourceType},
     enums::StructureObject,
     local::RoomName,
-    objects::{Room, Store, Structure},
+    objects::{Room, Store, Structure, StructureSpawn},
     prelude::*,
 };
 
-use crate::{constants::*, game, task::Task, worker::{Worker, WorkerRole}};
+use crate::{constants::*, game, task::{Task, TaskResult}, worker::{Worker, WorkerRole}};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Hauler {
@@ -35,6 +35,10 @@ impl Worker for Hauler {
                 Task::IdleUntil(u32::MAX)
             }
         }
+    }
+
+    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+        unimplemented!();
     }
 }
 

@@ -125,7 +125,7 @@ pub fn game_loop() {
     movement::run_movement_and_remove_worker_refs(&mut shard_state);
 
     info!(
-        "done! cpu: {}, global age {}",
+        "done! cpu: {}, execution instance age {}",
         game::cpu::get_used(),
         game::time() - shard_state.global_init_time
     )

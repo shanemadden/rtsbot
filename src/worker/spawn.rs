@@ -2,9 +2,9 @@ use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
 
-use screeps::{local::RoomName, objects::Store};
+use screeps::{constants::Part, constants::find, game, local::RoomName, objects::{Store, StructureSpawn}};
 
-use crate::{constants::*, game, task::Task, worker::{Worker, WorkerRole}};
+use crate::{constants::*, task::{Task, TaskResult}, worker::*};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Spawn {
@@ -29,13 +29,47 @@ impl Worker for Spawn {
         };
 
         // determine if we should spawn a builder
-        let mut should_spawn_builder = false;
+        let mut should_ensure_builder = false;
 
         // check for construction sites
-        // check for repairable structures
-        unimplemented!();
+        if room.find(find::MY_CONSTRUCTION_SITES, None).len() > 0 {
+            should_ensure_builder = true;
+        } else {
+            // check for repairable structures
 
-        //if !worker_roles.contains(WorkerRole::Builder(Builder{}))
+            for structure_object in room.find(find::STRUCTURES, None) {
+                let structure = structure_object.as_structure();
+                let hits = structure.hits();
+                let hits_max = structure.hits_max();
+
+                // if hits_max is 0, it's indestructable
+                if hits_max != 0 {
+                    // if the hits are below our 'watermark' to repair to
+                    // as well as less than half of this struture's max, repair!
+                    if hits < repair_watermark && hits * 2 < hits_max {
+                        should_ensure_builder = true;
+                        break
+                    }
+                }
+            }
+        }
+
+        if should_ensure_builder {
+            let role = WorkerRole::Builder(Builder {
+                home_room: self.room,
+                repair_watermark
+            });
+            if !worker_roles.contains(&role) {
+                return Task::SpawnCreep(role)
+            }
+        }
+
+        // todo: the remaining roles
+        Task::IdleUntil(u32::MAX)
+    }
+
+    fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
+        panic!("can't spawn creep for spawn")
     }
 
     fn can_move(&self) -> bool {
