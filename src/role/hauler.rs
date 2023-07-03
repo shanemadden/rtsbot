@@ -1,16 +1,16 @@
-use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 use screeps::{
-    constants::{Part, find, ResourceType},
+    constants::{find, Part, ResourceType},
     enums::StructureObject,
     local::RoomName,
     objects::{Room, Store, Structure, StructureSpawn},
     prelude::*,
 };
 
-use crate::{constants::*, game, task::{Task}, worker::{Worker}, role::WorkerRole};
+use crate::{constants::*, game, role::WorkerRole, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Hauler {

@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 
 use screeps::{
@@ -10,8 +9,8 @@ use screeps::{
 
 use crate::{
     movement::{MovementGoal, MovementProfile},
-    worker::WorkerReference,
     role::WorkerRole,
+    worker::WorkerReference,
 };
 
 mod build;

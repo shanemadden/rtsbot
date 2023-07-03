@@ -1,4 +1,4 @@
-use std::collections::{VecDeque, HashSet};
+use std::collections::{HashSet, VecDeque};
 
 use enum_dispatch::enum_dispatch;
 use log::*;
@@ -13,8 +13,8 @@ use screeps::{
 };
 
 use crate::{
-    role::*,
     movement::{MovementGoal, PathState},
+    role::*,
     task::{Task, TaskResult},
     ShardState,
 };
@@ -149,8 +149,11 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
                             // add to hashset where we track which roles are filled by active workers
                             shard_state.worker_roles.insert(role);
                             // then create the state struct
-                            WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep))
-                        },
+                            WorkerState::new_with_role_and_reference(
+                                role,
+                                WorkerReference::Creep(creep),
+                            )
+                        }
                         Err(e) => {
                             warn!("couldn't parse creep name {}: {:?}", creep_name, e);
                             // special case, don't insert to the hashset where we track roles, since
@@ -268,7 +271,9 @@ pub fn run_workers(shard_state: &mut ShardState) {
             None => {
                 // no task in queue, let's find one (even if it's just to go idle)
                 // include the worker's store and the worker role hashset
-                let new_task = worker_state.role.find_task(&worker_ref.store(), &shard_state.worker_roles);
+                let new_task = worker_state
+                    .role
+                    .find_task(&worker_ref.store(), &shard_state.worker_roles);
                 match new_task.run_task(&worker_ref) {
                     TaskResult::Complete => {
                         warn!("instantly completed new task, unexpected: {:?}", new_task)

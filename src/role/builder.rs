@@ -1,9 +1,9 @@
-use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 use screeps::{
-    constants::{find, ResourceType, Part},
+    constants::{find, Part, ResourceType},
     enums::StructureObject,
     game,
     local::RoomName,
@@ -11,7 +11,7 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{constants::*, task::{Task}, worker::Worker, role::WorkerRole};
+use crate::{constants::*, role::WorkerRole, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Builder {

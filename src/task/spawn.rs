@@ -1,10 +1,10 @@
 use log::*;
-use screeps::{constants::ErrorCode};
+use screeps::constants::ErrorCode;
 
 use crate::{
-    task::TaskResult,
-    worker::{WorkerReference, Worker},
     role::WorkerRole,
+    task::TaskResult,
+    worker::{Worker, WorkerReference},
 };
 
 pub fn spawn_creep(worker: &WorkerReference, role: &WorkerRole) -> TaskResult {
@@ -26,7 +26,7 @@ pub fn spawn_creep(worker: &WorkerReference, role: &WorkerRole) -> TaskResult {
                     }
                 },
             }
-        },
+        }
         _ => panic!("unsupported worker type!"),
     }
 }

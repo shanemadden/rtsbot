@@ -1,18 +1,15 @@
-use std::collections::{HashSet};
+use std::collections::HashSet;
 
 use enum_dispatch::enum_dispatch;
 
 use serde::{Deserialize, Serialize};
 
 use screeps::{
-    constants::{Part},
+    constants::Part,
     objects::{Store, StructureSpawn},
 };
 
-use crate::{
-    task::{Task},
-    worker::Worker,
-};
+use crate::{task::Task, worker::Worker};
 
 mod builder;
 mod hauler;
@@ -22,14 +19,9 @@ mod tower;
 mod upgrader;
 
 pub use self::{
-    builder::Builder,
-    hauler::Hauler,
-    source_harvester::SourceHarvester,
-    spawn::Spawn,
-    tower::Tower,
-    upgrader::Upgrader,
+    builder::Builder, hauler::Hauler, source_harvester::SourceHarvester, spawn::Spawn,
+    tower::Tower, upgrader::Upgrader,
 };
-
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Invalid {}

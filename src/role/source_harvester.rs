@@ -1,10 +1,16 @@
-use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
-use screeps::{constants::Part, constants::look, local::Position, objects::{Store, StructureSpawn}, prelude::*};
+use screeps::{
+    constants::look,
+    constants::Part,
+    local::Position,
+    objects::{Store, StructureSpawn},
+    prelude::*,
+};
 
-use crate::{task::{Task}, worker::Worker, role::WorkerRole};
+use crate::{role::WorkerRole, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {

@@ -1,10 +1,14 @@
-use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
-use screeps::{constants::Part, local::RoomName, objects::{Store, StructureSpawn}};
+use screeps::{
+    constants::Part,
+    local::RoomName,
+    objects::{Store, StructureSpawn},
+};
 
-use crate::{task::{Task}, worker::Worker, role::WorkerRole};
+use crate::{role::WorkerRole, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Tower {

@@ -1,10 +1,16 @@
-use std::collections::HashSet;
 use log::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
-use screeps::{constants::Part, constants::find, game, local::RoomName, objects::{Store, StructureSpawn}};
+use screeps::{
+    constants::find,
+    constants::Part,
+    game,
+    local::RoomName,
+    objects::{Store, StructureSpawn},
+};
 
-use crate::{constants::*, task::{Task}, role::*};
+use crate::{constants::*, role::*, task::Task};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Spawn {
@@ -16,8 +22,14 @@ impl Worker for Spawn {
         // for each role variant we want a creep occupying, check
         // if a worker exists; if not, that's the creep we'll pick to spawn next
 
-        let room = game::rooms().get(self.room).expect("expected room for active spawn");
-        let repair_watermark = match room.controller().expect("expected controller in room with spawn").level() {
+        let room = game::rooms()
+            .get(self.room)
+            .expect("expected room for active spawn");
+        let repair_watermark = match room
+            .controller()
+            .expect("expected controller in room with spawn")
+            .level()
+        {
             1 => REPAIR_WATERMARK_RCL_1,
             2 => REPAIR_WATERMARK_RCL_2,
             3 => REPAIR_WATERMARK_RCL_3,
@@ -48,7 +60,7 @@ impl Worker for Spawn {
                     // as well as less than half of this struture's max, repair!
                     if hits < repair_watermark && hits * 2 < hits_max {
                         should_ensure_builder = true;
-                        break
+                        break;
                     }
                 }
             }
@@ -57,10 +69,10 @@ impl Worker for Spawn {
         if should_ensure_builder {
             let role = WorkerRole::Builder(Builder {
                 home_room: self.room,
-                repair_watermark
+                repair_watermark,
             });
             if !worker_roles.contains(&role) {
-                return Task::SpawnCreep(role)
+                return Task::SpawnCreep(role);
             }
         }
 

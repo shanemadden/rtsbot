@@ -11,8 +11,8 @@ mod task;
 mod worker;
 
 use self::{
-    worker::{WorkerId, WorkerState},
     role::WorkerRole,
+    worker::{WorkerId, WorkerState},
 };
 
 // tunable important numbers for the bot, in one place for convenience
@@ -49,7 +49,6 @@ mod constants {
     pub const HAULER_ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
     // fill terminals to this much energy
     pub const TERMINAL_ENERGY_TARGET: u32 = 50_000;
-
 }
 
 // add wasm_bindgen to any function you would like to expose for call from js this one's
