@@ -93,8 +93,8 @@ pub struct ColonyState {
 // to use a reserved name as a function name, use `js_name`:
 #[wasm_bindgen(js_name = loop)]
 pub fn game_loop() {
-    debug!("loop starting! CPU: {}", game::cpu::get_used());
     let tick = game::time();
+    debug!("tick {} starting! CPU: {:.4}", tick, game::cpu::get_used());
 
     // SAFETY: only one instance of the game loop can be running at a time
     // We must use this same mutable reference throughout the entire tick,
@@ -127,8 +127,9 @@ pub fn game_loop() {
     //info!("workers {:?}", shard_state.worker_state);
 
     info!(
-        "done! cpu: {}, execution instance age {}",
+        "tick {} done! cpu: {:.4}, execution instance age {}",
+        tick,
         game::cpu::get_used(),
-        game::time() - shard_state.global_init_time
+        tick - shard_state.global_init_time
     )
 }
