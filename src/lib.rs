@@ -124,6 +124,8 @@ pub fn game_loop() {
     // as well as to enable them to be GC'd and their memory freed in js heap, if js wants to)
     movement::run_movement_and_remove_worker_refs(&mut shard_state);
 
+    //info!("workers {:?}", shard_state.worker_state);
+
     info!(
         "done! cpu: {}, execution instance age {}",
         game::cpu::get_used(),

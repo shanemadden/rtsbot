@@ -16,7 +16,8 @@ pub fn harvest_energy(worker: &WorkerReference, target: &ObjectId<Source>) -> Ta
                         // harvest tasks don't fail when we're full, but we don't want builder
                         // creeps that get harvest tasks to sit there dumping energy on the floor
                         // bail from the task every 10 ticks; dedicated harvests will find it again
-                        if game::time() % 10 == 0 {
+                        // todo nah this sucks we need to look at the store
+                        if game::time() % 100 == 0 {
                             TaskResult::Complete
                         } else {
                             TaskResult::StillWorking
