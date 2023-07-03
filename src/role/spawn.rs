@@ -77,7 +77,7 @@ impl Worker for Spawn {
         }
 
         // todo: the remaining roles
-        Task::IdleUntil(u32::MAX)
+        Task::IdleUntil(game::time() + 5)
     }
 
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {

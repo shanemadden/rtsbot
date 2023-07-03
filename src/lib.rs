@@ -97,7 +97,7 @@ pub struct ColonyState {
 #[wasm_bindgen(js_name = loop)]
 pub fn game_loop() {
     let tick = game::time();
-    debug!("tick {} starting! CPU: {:.4}", tick, game::cpu::get_used());
+    info!("tick {} starting! CPU: {:.4}", tick, game::cpu::get_used());
 
     // SAFETY: only one instance of the game loop can be running at a time
     // We must use this same mutable reference throughout the entire tick,
