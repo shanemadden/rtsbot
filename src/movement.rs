@@ -1,7 +1,12 @@
 use log::*;
 use std::collections::HashMap;
 
-use screeps::{constants::Direction, game, local::Position};
+use screeps::{
+    constants::Direction,
+    game,
+    local::Position,
+    visual::{LineDrawStyle, PolyStyle, RoomVisual},
+};
 
 use crate::{
     constants::*,
@@ -36,6 +41,30 @@ impl WorkerReference {
         current_position: Position,
         moving_creeps: &mut HashMap<Position, Direction>,
     ) -> Option<PathState> {
+        #[cfg(feature = "path-visuals")]
+        {
+            let mut points = vec![];
+            let mut cursor_pos = current_position;
+            for step in path_state.path[path_state.path_progress as usize..].iter() {
+                cursor_pos = cursor_pos + *step;
+                if cursor_pos.room_name() != current_position.room_name() {
+                    break;
+                }
+                points.push((cursor_pos.x().u8() as f32, cursor_pos.y().u8() as f32));
+            }
+            RoomVisual::new(Some(current_position.room_name())).poly(
+                points,
+                Some(
+                    PolyStyle::default()
+                        .fill("transparent")
+                        .stroke("#f00")
+                        .line_style(LineDrawStyle::Dashed)
+                        .stroke_width(0.15)
+                        .opacity(0.5),
+                ),
+            );
+        }
+
         match path_state.path.get(path_state.path_progress) {
             Some(direction) => match self {
                 WorkerReference::Creep(creep) => {
