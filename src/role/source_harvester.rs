@@ -21,7 +21,7 @@ impl Worker for SourceHarvester {
     fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         match self.source_position.look_for(look::SOURCES) {
             Ok(sources) => match sources.get(0) {
-                Some(source) => Task::HarvestEnergy(source.id()),
+                Some(source) => Task::HarvestEnergyForever(source.id()),
                 None => Task::MoveToPosition(self.source_position, 1),
             },
             Err(_) => Task::MoveToPosition(self.source_position, 1),

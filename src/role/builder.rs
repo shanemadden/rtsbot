@@ -110,7 +110,7 @@ fn find_energy_or_source(room: &Room) -> Task {
 
     // look for sources with energy we can harvest as a last resort
     if let Some(source) = room.find(find::SOURCES_ACTIVE, None).into_iter().next() {
-        return Task::HarvestEnergy(source.id());
+        return Task::HarvestEnergyUntilFull(source.id());
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)

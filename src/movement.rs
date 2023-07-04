@@ -41,8 +41,7 @@ impl WorkerReference {
         current_position: Position,
         moving_creeps: &mut HashMap<Position, Direction>,
     ) -> Option<PathState> {
-        #[cfg(feature = "path-visuals")]
-        {
+        if cfg!(feature = "path-visuals") {
             let mut points = vec![];
             let mut cursor_pos = current_position;
             for step in path_state.path[path_state.path_progress..].iter() {

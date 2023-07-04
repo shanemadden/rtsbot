@@ -35,7 +35,8 @@ pub enum TaskResult {
 pub enum Task {
     IdleUntil(u32),
     MoveToPosition(Position, u32),
-    HarvestEnergy(ObjectId<Source>),
+    HarvestEnergyUntilFull(ObjectId<Source>),
+    HarvestEnergyForever(ObjectId<Source>),
     Build(ObjectId<ConstructionSite>),
     Repair(ObjectId<Structure>),
     Upgrade(ObjectId<StructureController>),
@@ -70,7 +71,8 @@ impl Task {
                 }
             }
             // remaining task types are more complex and have handlers
-            Task::HarvestEnergy(id) => harvest::harvest_energy(worker, id),
+            Task::HarvestEnergyUntilFull(id) => harvest::harvest_energy_until_full(worker, id),
+            Task::HarvestEnergyForever(id) => harvest::harvest_energy_forever(worker, id),
             Task::Build(id) => build::build(worker, id),
             Task::Repair(id) => repair::repair(worker, id),
             Task::Upgrade(id) => upgrade::upgrade(worker, id),
