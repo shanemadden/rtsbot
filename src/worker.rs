@@ -32,9 +32,9 @@ impl WorkerId {
     /// Resolve the WorkerId into a WorkerReference if it still exists
     pub fn resolve(&self) -> Option<WorkerReference> {
         match self {
-            WorkerId::Creep(id) => id.resolve().map(|o| WorkerReference::Creep(o)),
-            WorkerId::Spawn(id) => id.resolve().map(|o| WorkerReference::Spawn(o)),
-            WorkerId::Tower(id) => id.resolve().map(|o| WorkerReference::Tower(o)),
+            WorkerId::Creep(id) => id.resolve().map(WorkerReference::Creep),
+            WorkerId::Spawn(id) => id.resolve().map(WorkerReference::Spawn),
+            WorkerId::Tower(id) => id.resolve().map(WorkerReference::Tower),
         }
     }
 }
@@ -228,7 +228,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 }
                 None => {
                     // couldn't resolve the worker, mark it for removal
-                    remove_worker_ids.push(worker_id.clone());
+                    remove_worker_ids.push(*worker_id);
                     remove_worker_roles.push(worker_state.role);
                     continue;
                 }
@@ -241,7 +241,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
         match worker_state.task_queue.pop_front() {
             Some(task) => {
                 // we've got a task, run it!
-                match task.run_task(&worker_ref) {
+                match task.run_task(worker_ref) {
                     // nothing to do if complete, already popped
                     TaskResult::Complete => {}
                     TaskResult::StillWorking => {
@@ -263,7 +263,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                         worker_state.task_queue.push_back(result_task);
                     }
                     TaskResult::DestroyWorker => {
-                        remove_worker_ids.push(worker_id.clone());
+                        remove_worker_ids.push(*worker_id);
                         remove_worker_roles.push(worker_state.role);
                     }
                 }
@@ -274,7 +274,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 let new_task = worker_state
                     .role
                     .find_task(&worker_ref.store(), &shard_state.worker_roles);
-                match new_task.run_task(&worker_ref) {
+                match new_task.run_task(worker_ref) {
                     TaskResult::Complete => {
                         warn!("instantly completed new task, unexpected: {:?}", new_task)
                     }
@@ -297,7 +297,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                         worker_state.task_queue.push_back(result_task);
                     }
                     TaskResult::DestroyWorker => {
-                        remove_worker_ids.push(worker_id.clone());
+                        remove_worker_ids.push(*worker_id);
                         remove_worker_roles.push(worker_state.role);
                     }
                 }

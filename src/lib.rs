@@ -102,15 +102,15 @@ pub fn game_loop() {
     // SAFETY: only one instance of the game loop can be running at a time
     // We must use this same mutable reference throughout the entire tick,
     // as any other access to it would cause undefined behavior!
-    let mut shard_state = unsafe { SHARD_STATE.get_or_insert_with(|| ShardState::default()) };
+    let shard_state = unsafe { SHARD_STATE.get_or_insert_with(ShardState::default) };
 
     // register all creeps that aren't yet in our tracking, and delete the state of any that we can
     // no longer see
-    worker::scan_and_register_creeps(&mut shard_state);
+    worker::scan_and_register_creeps(shard_state);
 
     // scan for new worker structures as well - every 100 ticks, or if this is the startup tick
     if tick % 100 == 0 || tick == shard_state.global_init_time {
-        worker::scan_and_register_structures(&mut shard_state);
+        worker::scan_and_register_structures(shard_state);
     }
 
     // run all registered workers, attempting to resolve those that haven't already and deleting
@@ -120,12 +120,12 @@ pub fn game_loop() {
     // intentionally ordered after we've completed all worker scanning for the tick so we
     // don't need to think about the case of dealing with the object stubs of creeps whose
     // spawn started this tick
-    worker::run_workers(&mut shard_state);
+    worker::run_workers(shard_state);
 
     // run movement phase now that all workers have run, while deleting the references to game
     // objects from the current tick (as a way to ensure they aren't used in future ticks
     // as well as to enable them to be GC'd and their memory freed in js heap, if js wants to)
-    movement::run_movement_and_remove_worker_refs(&mut shard_state);
+    movement::run_movement_and_remove_worker_refs(shard_state);
 
     //info!("workers {:?}", shard_state.worker_state);
 

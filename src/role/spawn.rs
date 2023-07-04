@@ -1,4 +1,4 @@
-use log::*;
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -44,7 +44,7 @@ impl Worker for Spawn {
         let mut should_ensure_builder = false;
 
         // check for construction sites
-        if room.find(find::MY_CONSTRUCTION_SITES, None).len() > 0 {
+        if !room.find(find::MY_CONSTRUCTION_SITES, None).is_empty() {
             should_ensure_builder = true;
         } else {
             // check for repairable structures

@@ -142,7 +142,7 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
                 if let Some(movement_goal) = worker_state.movement_goal.take() {
                     // we have a goal; first check if it's met
                     if position.get_range_to(movement_goal.goal_pos)
-                        <= movement_goal.goal_range as u32
+                        <= movement_goal.goal_range
                     {
                         // goal is met! unset the path_state if there is one and idle
                         worker_state.path_state = None;
@@ -201,7 +201,7 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
 
     // look for idle creeps where we actively have creeps saying they intend to move
     for (dest_pos, moving_direction) in moving_creeps.iter() {
-        match idle_creeps.get(&dest_pos) {
+        match idle_creeps.get(dest_pos) {
             // use the `std::ops::Neg` implementation to get the opposite direction
             Some(worker_reference) => worker_reference.swap_move(-*moving_direction),
             None => {}

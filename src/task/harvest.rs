@@ -26,7 +26,7 @@ pub fn harvest_energy(worker: &WorkerReference, target: &ObjectId<Source>) -> Ta
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
-                                goal_pos: source.pos().into(),
+                                goal_pos: source.pos(),
                                 goal_range: 1,
                                 profile: MovementProfile::RoadsOneToTwo,
                                 avoid_creeps: false,

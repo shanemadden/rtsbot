@@ -12,7 +12,7 @@ pub fn spawn_creep(worker: &WorkerReference, role: &WorkerRole) -> TaskResult {
         WorkerReference::Spawn(spawn) => {
             // serialize the name here and pass it through
             let name = serde_json::to_string(&role).expect("roles should all serialize");
-            let body = role.get_body_for_creep(&spawn);
+            let body = role.get_body_for_creep(spawn);
             match spawn.spawn_creep(&body, &name) {
                 Ok(()) => TaskResult::Complete,
                 Err(e) => match e {
