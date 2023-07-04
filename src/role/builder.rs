@@ -67,7 +67,11 @@ fn find_build_or_repair_task(room: &Room, repair_watermark: u32) -> Task {
     }
 
     // look for construction tasks next
-    for construction_site in room.find(find::MY_CONSTRUCTION_SITES, None) {
+    if let Some(construction_site) = room
+        .find(find::MY_CONSTRUCTION_SITES, None)
+        .into_iter()
+        .next()
+    {
         // we can unwrap this id because we know the room the site is in must be visible
         return Task::Build(construction_site.try_id().unwrap());
     }
@@ -105,7 +109,7 @@ fn find_energy_or_source(room: &Room) -> Task {
     }
 
     // look for sources with energy we can harvest as a last resort
-    for source in room.find(find::SOURCES_ACTIVE, None) {
+    if let Some(source) = room.find(find::SOURCES_ACTIVE, None).into_iter().next() {
         return Task::HarvestEnergy(source.id());
     }
 

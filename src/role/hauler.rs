@@ -109,31 +109,25 @@ fn find_delivery_target(room: &Room) -> Task {
     }
 
     // check the terminal if we found one
-    match maybe_terminal {
-        Some(terminal) => {
-            if terminal
-                .store()
-                .get_used_capacity(Some(ResourceType::Energy))
-                < TERMINAL_ENERGY_TARGET
-            {
-                return Task::DeliverToStructure(
-                    terminal.id().into_type::<Structure>(),
-                    ResourceType::Energy,
-                );
-            }
+    if let Some(terminal) = maybe_terminal {
+        if terminal
+            .store()
+            .get_used_capacity(Some(ResourceType::Energy))
+            < TERMINAL_ENERGY_TARGET
+        {
+            return Task::DeliverToStructure(
+                terminal.id().into_type::<Structure>(),
+                ResourceType::Energy,
+            );
         }
-        None => {}
     }
 
     // and finally check the storage
-    match maybe_storage {
-        Some(storage) => {
-            return Task::DeliverToStructure(
-                storage.id().into_type::<Structure>(),
-                ResourceType::Energy,
-            )
-        }
-        None => {}
+    if let Some(storage) = maybe_storage {
+        return Task::DeliverToStructure(
+            storage.id().into_type::<Structure>(),
+            ResourceType::Energy,
+        );
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)

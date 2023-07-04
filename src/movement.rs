@@ -45,7 +45,7 @@ impl WorkerReference {
         {
             let mut points = vec![];
             let mut cursor_pos = current_position;
-            for step in path_state.path[path_state.path_progress as usize..].iter() {
+            for step in path_state.path[path_state.path_progress..].iter() {
                 cursor_pos = cursor_pos + *step;
                 if cursor_pos.room_name() != current_position.room_name() {
                     break;
@@ -141,9 +141,7 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
                 // it can move - check if it has somewhere to be, and mark it as idle if not
                 if let Some(movement_goal) = worker_state.movement_goal.take() {
                     // we have a goal; first check if it's met
-                    if position.get_range_to(movement_goal.goal_pos)
-                        <= movement_goal.goal_range
-                    {
+                    if position.get_range_to(movement_goal.goal_pos) <= movement_goal.goal_range {
                         // goal is met! unset the path_state if there is one and idle
                         worker_state.path_state = None;
                         idle_creeps.insert(position, worker_reference);
@@ -201,10 +199,8 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
 
     // look for idle creeps where we actively have creeps saying they intend to move
     for (dest_pos, moving_direction) in moving_creeps.iter() {
-        match idle_creeps.get(dest_pos) {
-            // use the `std::ops::Neg` implementation to get the opposite direction
-            Some(worker_reference) => worker_reference.swap_move(-*moving_direction),
-            None => {}
+        if let Some(worker_reference) = idle_creeps.get(dest_pos) {
+            worker_reference.swap_move(-*moving_direction)
         }
     }
 }
