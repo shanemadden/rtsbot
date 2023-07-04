@@ -13,7 +13,7 @@ use screeps::{
 };
 
 use crate::{
-    movement::{MovementGoal, PathState},
+    movement::{MovementGoal, MovementProfile, PathState},
     role::*,
     task::{Task, TaskResult},
     ShardState,
@@ -82,14 +82,19 @@ impl WorkerReference {
 // to be called by enum_dispatch
 #[enum_dispatch]
 pub trait Worker {
-    // function to be called for the worker when it has no work to do,
-    // so that it can find another task (even if it's just to idle)
+    /// to be called for the worker when it has no work to do,
+    /// so that it can find another task (even if it's just to idle)
     fn find_task(&self, store: &Store, worker_roles: &HashSet<WorkerRole>) -> Task;
 
-    // function called for spawning a creep for a worker role
+    /// gets the desired body to spawn a creep for a worker role
     fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part>;
 
-    // default implementation saying worker types can move
+    /// movement profile for pathfinding - default to preferring roads
+    fn get_movement_profile(&self) -> MovementProfile {
+        MovementProfile::RoadsOneToTwo
+    }
+
+    /// whether the worker can move - defaults to true, should return false for structures
     fn can_move(&self) -> bool {
         true
     }
@@ -237,11 +242,12 @@ pub fn run_workers(shard_state: &mut ShardState) {
 
         // we've either resolved the worker or continue has jumped out of the loop, unwrap
         let worker_ref = worker_state.worker_reference.as_ref().unwrap();
+        let movement_profile = worker_state.role.get_movement_profile();
 
         match worker_state.task_queue.pop_front() {
             Some(task) => {
                 // we've got a task, run it!
-                match task.run_task(worker_ref) {
+                match task.run_task(worker_ref, movement_profile) {
                     // nothing to do if complete, already popped
                     TaskResult::Complete => {}
                     TaskResult::StillWorking => {
@@ -274,7 +280,7 @@ pub fn run_workers(shard_state: &mut ShardState) {
                 let new_task = worker_state
                     .role
                     .find_task(&worker_ref.store(), &shard_state.worker_roles);
-                match new_task.run_task(worker_ref) {
+                match new_task.run_task(worker_ref, movement_profile) {
                     TaskResult::Complete => {
                         warn!("instantly completed new task, unexpected: {:?}", new_task)
                     }

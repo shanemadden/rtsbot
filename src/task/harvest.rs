@@ -15,6 +15,7 @@ use crate::{
 pub fn harvest_energy_until_full(
     worker: &WorkerReference,
     target: &ObjectId<Source>,
+    movement_profile: MovementProfile,
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
@@ -33,7 +34,7 @@ pub fn harvest_energy_until_full(
                             let move_goal = MovementGoal {
                                 goal_pos: source.pos(),
                                 goal_range: 1,
-                                profile: MovementProfile::RoadsOneToTwo,
+                                profile: movement_profile,
                                 avoid_creeps: false,
                             };
                             TaskResult::MoveMeTo(move_goal)
@@ -54,7 +55,11 @@ pub fn harvest_energy_until_full(
     }
 }
 
-pub fn harvest_energy_forever(worker: &WorkerReference, target: &ObjectId<Source>) -> TaskResult {
+pub fn harvest_energy_forever(
+    worker: &WorkerReference,
+    target: &ObjectId<Source>,
+    movement_profile: MovementProfile,
+) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(source) => {
@@ -65,7 +70,7 @@ pub fn harvest_energy_forever(worker: &WorkerReference, target: &ObjectId<Source
                             let move_goal = MovementGoal {
                                 goal_pos: source.pos(),
                                 goal_range: 1,
-                                profile: MovementProfile::RoadsOneToTwo,
+                                profile: movement_profile,
                                 avoid_creeps: false,
                             };
                             TaskResult::MoveMeTo(move_goal)

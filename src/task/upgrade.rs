@@ -7,7 +7,11 @@ use crate::{
     worker::WorkerReference,
 };
 
-pub fn upgrade(worker: &WorkerReference, target: &ObjectId<StructureController>) -> TaskResult {
+pub fn upgrade(
+    worker: &WorkerReference,
+    target: &ObjectId<StructureController>,
+    movement_profile: MovementProfile,
+) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(controller) => match creep.upgrade_controller(&controller) {
@@ -17,7 +21,7 @@ pub fn upgrade(worker: &WorkerReference, target: &ObjectId<StructureController>)
                         let move_goal = MovementGoal {
                             goal_pos: controller.pos().into(),
                             goal_range: 1,
-                            profile: MovementProfile::RoadsOneToTwo,
+                            profile: movement_profile,
                             avoid_creeps: false,
                         };
                         TaskResult::MoveMeTo(move_goal)

@@ -7,7 +7,11 @@ use crate::{
     worker::WorkerReference,
 };
 
-pub fn repair(worker: &WorkerReference, target: &ObjectId<Structure>) -> TaskResult {
+pub fn repair(
+    worker: &WorkerReference,
+    target: &ObjectId<Structure>,
+    movement_profile: MovementProfile,
+) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(target_structure) => match creep.repair(&target_structure) {
@@ -17,7 +21,7 @@ pub fn repair(worker: &WorkerReference, target: &ObjectId<Structure>) -> TaskRes
                         let move_goal = MovementGoal {
                             goal_pos: target_structure.pos().into(),
                             goal_range: 1,
-                            profile: MovementProfile::RoadsOneToTwo,
+                            profile: movement_profile,
                             avoid_creeps: false,
                         };
                         TaskResult::MoveMeTo(move_goal)

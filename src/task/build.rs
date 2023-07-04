@@ -7,7 +7,11 @@ use crate::{
     worker::WorkerReference,
 };
 
-pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> TaskResult {
+pub fn build(
+    worker: &WorkerReference,
+    target: &ObjectId<ConstructionSite>,
+    movement_profile: MovementProfile,
+) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(construction_site) => {
@@ -18,7 +22,7 @@ pub fn build(worker: &WorkerReference, target: &ObjectId<ConstructionSite>) -> T
                             let move_goal = MovementGoal {
                                 goal_pos: construction_site.pos().into(),
                                 goal_range: 1,
-                                profile: MovementProfile::RoadsOneToTwo,
+                                profile: movement_profile,
                                 avoid_creeps: false,
                             };
                             TaskResult::MoveMeTo(move_goal)

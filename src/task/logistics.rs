@@ -13,7 +13,11 @@ use crate::{
     worker::WorkerReference,
 };
 
-pub fn take_from_resource(worker: &WorkerReference, target: &ObjectId<Resource>) -> TaskResult {
+pub fn take_from_resource(
+    worker: &WorkerReference,
+    target: &ObjectId<Resource>,
+    movement_profile: MovementProfile,
+) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
             Some(resource) => {
@@ -24,7 +28,7 @@ pub fn take_from_resource(worker: &WorkerReference, target: &ObjectId<Resource>)
                             let move_goal = MovementGoal {
                                 goal_pos: resource.pos(),
                                 goal_range: 1,
-                                profile: MovementProfile::RoadsOneToTwo,
+                                profile: movement_profile,
                                 avoid_creeps: false,
                             };
                             TaskResult::MoveMeTo(move_goal)
@@ -50,6 +54,7 @@ pub fn take_from_structure(
     worker: &WorkerReference,
     target: ObjectId<Structure>,
     resource_type: ResourceType,
+    movement_profile: MovementProfile,
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
@@ -63,7 +68,7 @@ pub fn take_from_structure(
                                 let move_goal = MovementGoal {
                                     goal_pos: structure_object.pos(),
                                     goal_range: 1,
-                                    profile: MovementProfile::RoadsOneToTwo,
+                                    profile: movement_profile,
                                     avoid_creeps: false,
                                 };
                                 TaskResult::MoveMeTo(move_goal)
@@ -95,6 +100,7 @@ pub fn deliver_to_structure(
     worker: &WorkerReference,
     target: ObjectId<Structure>,
     resource_type: ResourceType,
+    movement_profile: MovementProfile,
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
@@ -108,7 +114,7 @@ pub fn deliver_to_structure(
                                 let move_goal = MovementGoal {
                                     goal_pos: structure_object.pos(),
                                     goal_range: 1,
-                                    profile: MovementProfile::RoadsOneToTwo,
+                                    profile: movement_profile,
                                     avoid_creeps: false,
                                 };
                                 TaskResult::MoveMeTo(move_goal)

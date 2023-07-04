@@ -48,7 +48,11 @@ pub enum Task {
 }
 
 impl Task {
-    pub fn run_task(&self, worker: &WorkerReference) -> TaskResult {
+    pub fn run_task(
+        &self,
+        worker: &WorkerReference,
+        movement_profile: MovementProfile,
+    ) -> TaskResult {
         match self {
             // idle worker, let's just deal with that directly
             Task::IdleUntil(tick) => {
@@ -65,20 +69,30 @@ impl Task {
                     TaskResult::MoveMeTo(MovementGoal {
                         goal_pos: *position,
                         goal_range: *range,
-                        profile: MovementProfile::RoadsOneToTwo,
+                        profile: movement_profile,
                         avoid_creeps: false,
                     })
                 }
             }
             // remaining task types are more complex and have handlers
-            Task::HarvestEnergyUntilFull(id) => harvest::harvest_energy_until_full(worker, id),
-            Task::HarvestEnergyForever(id) => harvest::harvest_energy_forever(worker, id),
-            Task::Build(id) => build::build(worker, id),
-            Task::Repair(id) => repair::repair(worker, id),
-            Task::Upgrade(id) => upgrade::upgrade(worker, id),
-            Task::TakeFromResource(id) => logistics::take_from_resource(worker, id),
-            Task::TakeFromStructure(id, ty) => logistics::take_from_structure(worker, *id, *ty),
-            Task::DeliverToStructure(id, ty) => logistics::deliver_to_structure(worker, *id, *ty),
+            Task::HarvestEnergyUntilFull(id) => {
+                harvest::harvest_energy_until_full(worker, id, movement_profile)
+            }
+            Task::HarvestEnergyForever(id) => {
+                harvest::harvest_energy_forever(worker, id, movement_profile)
+            }
+            Task::Build(id) => build::build(worker, id, movement_profile),
+            Task::Repair(id) => repair::repair(worker, id, movement_profile),
+            Task::Upgrade(id) => upgrade::upgrade(worker, id, movement_profile),
+            Task::TakeFromResource(id) => {
+                logistics::take_from_resource(worker, id, movement_profile)
+            }
+            Task::TakeFromStructure(id, ty) => {
+                logistics::take_from_structure(worker, *id, *ty, movement_profile)
+            }
+            Task::DeliverToStructure(id, ty) => {
+                logistics::deliver_to_structure(worker, *id, *ty, movement_profile)
+            }
             Task::SpawnCreep(role) => spawn::spawn_creep(worker, role),
             Task::WaitToSpawn => spawn::wait_to_spawn(worker),
         }
