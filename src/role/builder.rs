@@ -11,7 +11,9 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{constants::*, role::WorkerRole, task::Task, worker::Worker};
+use crate::{
+    constants::*, movement::MovementProfile, role::WorkerRole, task::Task, worker::Worker,
+};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Builder {
@@ -37,6 +39,10 @@ impl Worker for Builder {
                 Task::IdleUntil(u32::MAX)
             }
         }
+    }
+
+    fn get_movement_profile(&self) -> MovementProfile {
+        MovementProfile::PlainsOneToOne
     }
 
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {

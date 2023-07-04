@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use log::*;
-use screeps::{game, RoomName};
+use screeps::{game, local::RoomName};
 use wasm_bindgen::prelude::*;
 
 mod logging;
@@ -17,6 +17,7 @@ use self::{
 
 // tunable important numbers for the bot, in one place for convenience
 mod constants {
+    use screeps::constants::{*, Part::*};
     // won't do pathing for moving creeps if CPU is above this number
     pub const HIGH_CPU_THRESHOLD: f64 = 250.;
     // won't do pathing for moving creeps if bucket is below this number
@@ -29,7 +30,7 @@ mod constants {
     // default is 1.2 - but it risks non-optimal paths, so we turn it down a bit
     pub const HEURISTIC_WEIGHT: f64 = 1.0;
     // when task finding fails, idle this long
-    pub const NO_TASK_IDLE_TICKS: u32 = 5;
+    pub const NO_TASK_IDLE_TICKS: u32 = 10;
     // builder role considers energy for grabbing above this amount
     pub const BUILDER_ENERGY_PICKUP_THRESHOLD: u32 = 100;
     // builder role considers energy for withdraw from structures above this amount
@@ -43,6 +44,9 @@ mod constants {
     pub const REPAIR_WATERMARK_RCL_6: u32 = 500_000;
     pub const REPAIR_WATERMARK_RCL_7: u32 = 1_000_000;
     pub const REPAIR_WATERMARK_RCL_8: u32 = 3_000_000;
+    pub const HAULER_COST_PER_MULTIPLIER: u32 = Carry.cost() * 2 + Move.cost();
+    pub const HAULER_PARTS_PER_MULTIPLIER: u32 = 3;
+    pub const HAULER_MAX_MULTIPLIER: u32 = MAX_CREEP_SIZE / HAULER_PARTS_PER_MULTIPLIER;
     // hauler role considers energy for grabbing above this amount
     pub const HAULER_ENERGY_PICKUP_THRESHOLD: u32 = 35;
     // hauler role considers energy for withdraw from structures above this amount
