@@ -42,13 +42,7 @@ impl Worker for Hauler {
         let max_energy_avail = spawn.room().expect("spawn to have room").energy_capacity_available();
         let multiplier = std::cmp::min(max_energy_avail / HAULER_COST_PER_MULTIPLIER, HAULER_MAX_MULTIPLIER);
 
-        let mut body = vec![];
-        for _ in 0..multiplier {
-            body.push(Part::Carry);
-            body.push(Part::Carry);
-            body.push(Part::Move);
-        }
-        body
+        [Part::Carry, Part::Carry, Part::Move].repeat(multiplier as usize)
     }
 }
 
@@ -94,9 +88,9 @@ fn find_delivery_target(room: &Room) -> Task {
         let (store, structure) = match structure {
             // for the three object types that are important to fill, snag their store then cast
             // them right back to StructureObject
-            StructureObject::StructureSpawn(o) => (o.store(), StructureObject::from(o)),
-            StructureObject::StructureExtension(o) => (o.store(), StructureObject::from(o)),
-            StructureObject::StructureTower(o) => (o.store(), StructureObject::from(o)),
+            StructureObject::StructureSpawn(ref o) => (o.store(), structure),
+            StructureObject::StructureExtension(ref o) => (o.store(), structure),
+            StructureObject::StructureTower(ref o) => (o.store(), structure),
             // don't want to look at these types in this iteration, in case
             // one of the covered priority types is later in the vec
             StructureObject::StructureStorage(o) => {
