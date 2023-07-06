@@ -39,8 +39,14 @@ impl Worker for Hauler {
 
     fn get_body_for_creep(&self, spawn: &StructureSpawn) -> Vec<Part> {
         // scale the creep to larger depending on how much capacity we have available
-        let max_energy_avail = spawn.room().expect("spawn to have room").energy_capacity_available();
-        let multiplier = std::cmp::min(max_energy_avail / HAULER_COST_PER_MULTIPLIER, HAULER_MAX_MULTIPLIER);
+        let max_energy_avail = spawn
+            .room()
+            .expect("spawn to have room")
+            .energy_capacity_available();
+        let multiplier = std::cmp::min(
+            max_energy_avail / HAULER_COST_PER_MULTIPLIER,
+            HAULER_MAX_MULTIPLIER,
+        );
 
         [Part::Carry, Part::Carry, Part::Move].repeat(multiplier as usize)
     }

@@ -17,7 +17,7 @@ use self::{
 
 // tunable important numbers for the bot, in one place for convenience
 mod constants {
-    use screeps::constants::{*, Part::*};
+    use screeps::constants::{Part::*, *};
     // won't do pathing for moving creeps if CPU is above this number
     pub const HIGH_CPU_THRESHOLD: f64 = 250.;
     // won't do pathing for moving creeps if bucket is below this number
@@ -51,6 +51,8 @@ mod constants {
     pub const HAULER_ENERGY_PICKUP_THRESHOLD: u32 = 35;
     // hauler role considers energy for withdraw from structures above this amount
     pub const HAULER_ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
+    // upgrader roler considers energy for withdraw from structures above this amount
+    pub const UPGRADER_ENERGY_WITHDRAW_THRESHOLD: u32 = 1_200;
     // fill terminals to this much energy
     pub const TERMINAL_ENERGY_TARGET: u32 = 50_000;
 }
