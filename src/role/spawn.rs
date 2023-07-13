@@ -66,17 +66,41 @@ impl Worker for Spawn {
         }
 
         if should_ensure_builder {
-            let role = WorkerRole::Builder(Builder {
+            let builder_role = WorkerRole::Builder(Builder {
                 home_room: self.room,
                 repair_watermark,
             });
-            if !worker_roles.contains(&role) {
-                return Task::SpawnCreep(role);
+            if !worker_roles.contains(&builder_role) {
+                return Task::SpawnCreep(builder_role);
             }
         }
 
-        // todo: the remaining roles
-        Task::IdleUntil(game::time() + 5)
+        for i in 0..HAULER_COUNT_TARGET {
+            // check up until our max count, ensuring each one exists
+            let hauler_role = WorkerRole::Hauler(Hauler {
+                home_room: self.room,
+                id: i,
+            });
+            if !worker_roles.contains(&hauler_role) {
+                return Task::SpawnCreep(hauler_role);
+            }
+        }
+
+        for i in 0..UPGRADER_COUNT_TARGET {
+            // check up until our max count, ensuring each one exists
+            let upgrader_role = WorkerRole::Upgrader(Upgrader {
+                home_room: self.room,
+                id: i,
+            });
+            if !worker_roles.contains(&upgrader_role) {
+                return Task::SpawnCreep(upgrader_role);
+            }
+        }
+
+        // todo source harvesters too, look at sources on room if RCL high enough
+
+        // last resort, idle
+        Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)
     }
 
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {

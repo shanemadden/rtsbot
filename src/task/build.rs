@@ -1,7 +1,8 @@
 use log::*;
-use screeps::{constants::ErrorCode, local::ObjectId, objects::ConstructionSite};
+use screeps::{constants::*, local::ObjectId, objects::ConstructionSite, prelude::*};
 
 use crate::{
+    constants::*,
     movement::{MovementGoal, MovementProfile},
     task::TaskResult,
     worker::WorkerReference,
@@ -19,11 +20,15 @@ pub fn build(
                     Ok(()) => TaskResult::StillWorking,
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
+                            // if we're just out of range, we want to avoid creeps since we
+                            // likely got swapped out by a crowd
+                            let avoid_creeps = creep.pos().get_range_to(construction_site.pos())
+                                == RANGED_OUT_OF_RANGE;
                             let move_goal = MovementGoal {
-                                goal_pos: construction_site.pos().into(),
+                                goal_pos: construction_site.pos(),
                                 goal_range: 1,
                                 profile: movement_profile,
-                                avoid_creeps: false,
+                                avoid_creeps,
                             };
                             TaskResult::MoveMeTo(move_goal)
                         }

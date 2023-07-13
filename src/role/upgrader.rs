@@ -40,7 +40,7 @@ impl Worker for Upgrader {
 
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         use Part::*;
-        vec![Move, Move, Work, Work]
+        vec![Move, Move, Carry, Work]
     }
 }
 
@@ -70,6 +70,11 @@ fn find_energy(room: &Room) -> Task {
         {
             return Task::TakeFromStructure(structure.as_structure().id(), ResourceType::Energy);
         }
+    }
+
+    // look for sources with energy we can harvest as a last resort
+    if let Some(source) = room.find(find::SOURCES_ACTIVE, None).into_iter().next() {
+        return Task::HarvestEnergyUntilFull(source.id());
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)

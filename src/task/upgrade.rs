@@ -1,7 +1,8 @@
 use log::*;
-use screeps::{constants::ErrorCode, local::ObjectId, objects::StructureController};
+use screeps::{constants::ErrorCode, local::ObjectId, objects::StructureController, prelude::*};
 
 use crate::{
+    constants::*,
     movement::{MovementGoal, MovementProfile},
     task::TaskResult,
     worker::WorkerReference,
@@ -18,11 +19,13 @@ pub fn upgrade(
                 Ok(()) => TaskResult::StillWorking,
                 Err(e) => match e {
                     ErrorCode::NotInRange => {
+                        let avoid_creeps =
+                            creep.pos().get_range_to(controller.pos()) == RANGED_OUT_OF_RANGE;
                         let move_goal = MovementGoal {
-                            goal_pos: controller.pos().into(),
+                            goal_pos: controller.pos(),
                             goal_range: 1,
                             profile: movement_profile,
-                            avoid_creeps: false,
+                            avoid_creeps,
                         };
                         TaskResult::MoveMeTo(move_goal)
                     }

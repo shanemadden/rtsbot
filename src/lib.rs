@@ -15,46 +15,67 @@ use self::{
     worker::{WorkerId, WorkerState},
 };
 
-// tunable important numbers for the bot, in one place for convenience
+/// Tunable important numbers for the bot, in one place for convenience
 mod constants {
     use screeps::constants::{Part::*, *};
-    // won't do pathing for moving creeps if CPU is above this number
+    /// Won't do pathing for moving creeps if CPU is above this number
     pub const HIGH_CPU_THRESHOLD: f64 = 250.;
-    // won't do pathing for moving creeps if bucket is below this number
+    /// Won't do pathing for moving creeps if bucket is below this number
     pub const LOW_BUCKET_THRESHOLD: i32 = 1_000;
-    // consider creeps to be stuck and get them a new path after this many ticks
+    /// Consider creeps to be stuck and get them a new path after this many ticks
     pub const STUCK_REPATH_THRESHOLD: u8 = 10;
-    // limits for pathfinder calls
+    /// Limit for pathfinder ops
     pub const MAX_OPS: u32 = 100_000;
+    /// Limit for pathfinder rooms
     pub const MAX_ROOMS: u8 = 64;
-    // default is 1.2 - but it risks non-optimal paths, so we turn it down a bit
+    /// A* heuristic weight - default is 1.2, but it risks non-optimal paths, so we turn it down a bit
     pub const HEURISTIC_WEIGHT: f64 = 1.0;
-    // when task finding fails, idle this long
+    /// When task finding fails, idle this long
     pub const NO_TASK_IDLE_TICKS: u32 = 10;
-    // builder role considers energy for grabbing above this amount
+    /// Builder role considers energy on the groundfor grabbing above this amount
     pub const BUILDER_ENERGY_PICKUP_THRESHOLD: u32 = 100;
-    // builder role considers energy for withdraw from structures above this amount
+    /// Builder role considers energy for withdraw from structures above this amount
     pub const BUILDER_ENERGY_WITHDRAW_THRESHOLD: u32 = 1_000;
-    // builder role repair maximums
+    /// Builder role repair maximum at RCL1
     pub const REPAIR_WATERMARK_RCL_1: u32 = 10_000;
+    /// Builder role repair maximum at RCL2
     pub const REPAIR_WATERMARK_RCL_2: u32 = 10_000;
+    /// Builder role repair maximum at RCL3
     pub const REPAIR_WATERMARK_RCL_3: u32 = 50_000;
+    /// Builder role repair maximum at RCL4
     pub const REPAIR_WATERMARK_RCL_4: u32 = 100_000;
+    /// Builder role repair maximum at RCL5
     pub const REPAIR_WATERMARK_RCL_5: u32 = 100_000;
+    /// Builder role repair maximum at RCL6
     pub const REPAIR_WATERMARK_RCL_6: u32 = 500_000;
+    /// Builder role repair maximum at RCL7
     pub const REPAIR_WATERMARK_RCL_7: u32 = 1_000_000;
+    /// Builder role repair maximum at RCL8
     pub const REPAIR_WATERMARK_RCL_8: u32 = 3_000_000;
+    /// Cost of each set of hauler body parts (2 carry, 1 move)
     pub const HAULER_COST_PER_MULTIPLIER: u32 = Carry.cost() * 2 + Move.cost();
+    /// Count of parts in the hauler body set
     pub const HAULER_PARTS_PER_MULTIPLIER: u32 = 3;
+    /// How many haulers to try to keep alive in each room
+    pub const HAULER_COUNT_TARGET: u8 = 1;
+    /// Largest number of sets to allow a hauler to be spawned with
     pub const HAULER_MAX_MULTIPLIER: u32 = MAX_CREEP_SIZE / HAULER_PARTS_PER_MULTIPLIER;
-    // hauler role considers energy for grabbing above this amount
+    /// Hauler role considers energy on the ground for grabbing above this amount
     pub const HAULER_ENERGY_PICKUP_THRESHOLD: u32 = 35;
-    // hauler role considers energy for withdraw from structures above this amount
+    /// Hauler role considers energy for withdraw from structures above this amount
     pub const HAULER_ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
-    // upgrader roler considers energy for withdraw from structures above this amount
+    /// How many upgraders to try to keep alive in each room
+    pub const UPGRADER_COUNT_TARGET: u8 = 4;
+    /// Upgrader roler considers energy for withdraw from structures above this amount
     pub const UPGRADER_ENERGY_WITHDRAW_THRESHOLD: u32 = 1_200;
-    // fill terminals to this much energy
+    /// Fill terminals to this much energy
     pub const TERMINAL_ENERGY_TARGET: u32 = 50_000;
+    /// Creeps are just out of range of their ranged action at this range; at this range
+    /// they'll usually path avoiding creeps
+    pub const RANGED_OUT_OF_RANGE: u32 = (CREEP_RANGED_ACTION_RANGE + 1) as u32;
+    /// Creeps are just out of range of their melee action at this range; at this range
+    /// they'll usually path avoiding creeps
+    pub const MELEE_OUT_OF_RANGE: u32 = 2;
 }
 
 // add wasm_bindgen to any function you would like to expose for call from js this one's
