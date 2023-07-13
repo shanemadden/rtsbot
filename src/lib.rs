@@ -78,7 +78,7 @@ mod constants {
     pub const MELEE_OUT_OF_RANGE: u32 = 2;
 }
 
-// add wasm_bindgen to any function you would like to expose for call from js this one's
+// add wasm_bindgen to any function you would like to expose for call from js - this one's
 // special and must only be called once, so handling for it is carefully managed in main.js
 #[wasm_bindgen]
 pub fn log_setup() {
