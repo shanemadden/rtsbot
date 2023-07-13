@@ -24,6 +24,7 @@ module.exports.loop = function () {
         // when a creep is spawned) won't trigger an attempt to parse RawMemory. Replace the object
         // with one unattached to memory magic - game functions will access the `Memory` object and
         // can throw data in here, and it'll go away at the end of tick.
+        
         // Because it's in place, RawMemory's string won't be thrown to JSON.parse to deserialize -
         // and because that didn't happen, RawMemory._parsed isn't set and won't trigger a
         // post-tick serialize.
@@ -45,17 +46,19 @@ module.exports.loop = function () {
                     console.log("low CPU, waiting" + JSON.stringify(Game.cpu));
                     return;
                 }
-                // load the module, which we do here instead of at the top of loop because that can
-                // potentially cause the module to be unable to load if it's too heavy and trap the
-                // load cycle with no bucket to recover
+                // load the module, which we do here instead of at the top of the filebecause that
+                // can potentially cause the module to be unable to load if it's too heavy and trap
+                // the load cycle with no bucket to recover
                 wasm_module = require(MODULE_NAME);
                 // setup wasm instance, which attaches at wasm_module.__wasm
                 wasm_module.initialize_instance();
-                // run logging setup - then mark it as done only if it returns, since running out
-                // of CPU time is possible at any time here.
+                // run logging setup - then mark it as done only after it returns, since running out
+                // of CPU time is possible at any time here
                 wasm_module.log_setup();
                 log_setup_done = true;
-                // normal game loop after finishing all the setup
+                // keep going into the normal game loop after setup, it should handle the case of
+                // realizing if the init took a lot of CPU time to make sure we don't use enough in
+                // the first tick to risk an out-of-CPU crash and send us back to reloading
                 wasm_module.loop();
             }
         } catch (error) {
