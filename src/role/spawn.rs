@@ -75,6 +75,12 @@ impl Worker for Spawn {
             }
         }
 
+        // todo - right now we're getting stuck on the hauler task since it can't scale down and the builders don't 
+        // supply the spawn structures. need to split into emergency builders which only happen at low RCL or in emergencies
+        // which supply the spawns then later RCL builders that only build and repair
+
+        // ... then just wrap up getting the source harvesters going at certain RCLs and I think this example bot is
+        // pretty much 'done'
         for i in 0..HAULER_COUNT_TARGET {
             // check up until our max count, ensuring each one exists
             let hauler_role = WorkerRole::Hauler(Hauler {
