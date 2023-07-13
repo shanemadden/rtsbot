@@ -18,7 +18,7 @@ use self::{
 /// Tunable important numbers for the bot, in one place for convenience
 mod constants {
     use screeps::constants::{Part::*, *};
-    /// Won't do pathing for moving creeps if CPU is above this number
+    /// Won't do pathing for moving creeps if current-tick CPU spend is above this level when movement step is reached
     pub const HIGH_CPU_THRESHOLD: f64 = 250.;
     /// Won't do pathing for moving creeps if bucket is below this number
     pub const LOW_BUCKET_THRESHOLD: i32 = 1_000;
@@ -81,7 +81,7 @@ mod constants {
 // add wasm_bindgen to any function you would like to expose for call from js this one's
 // special and must only be called once, so handling for it is carefully managed in main.js
 #[wasm_bindgen]
-pub fn setup() {
+pub fn log_setup() {
     // show all output of Info level, adjust as needed
     logging::setup_logging(logging::Info);
 }
