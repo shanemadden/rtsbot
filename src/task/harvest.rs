@@ -35,8 +35,8 @@ pub fn harvest_energy_until_full(
                             let avoid_creeps =
                                 creep.pos().get_range_to(source.pos()) == MELEE_OUT_OF_RANGE;
                             let move_goal = MovementGoal {
-                                goal_pos: source.pos(),
-                                goal_range: 1,
+                                pos: source.pos(),
+                                range: 1,
                                 profile: movement_profile,
                                 avoid_creeps,
                             };
@@ -71,8 +71,8 @@ pub fn harvest_energy_forever(
                     Err(e) => match e {
                         ErrorCode::NotInRange => {
                             let move_goal = MovementGoal {
-                                goal_pos: source.pos(),
-                                goal_range: 1,
+                                pos: source.pos(),
+                                range: 1,
                                 profile: movement_profile,
                                 avoid_creeps: false,
                             };

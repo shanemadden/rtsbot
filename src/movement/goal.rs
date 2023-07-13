@@ -11,8 +11,8 @@ use crate::{
 // will need to know to get them there
 #[derive(Eq, PartialEq, Hash, Debug, Clone, Copy)]
 pub struct MovementGoal {
-    pub goal_pos: Position,
-    pub goal_range: u32,
+    pub pos: Position,
+    pub range: u32,
     pub profile: MovementProfile,
     pub avoid_creeps: bool,
 }
@@ -30,8 +30,8 @@ impl MovementGoal {
                         .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
-                        self.goal_pos,
-                        self.goal_range,
+                        self.pos,
+                        self.range,
                         Some(options),
                     )
                 }
@@ -42,8 +42,8 @@ impl MovementGoal {
                         .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
-                        self.goal_pos,
-                        self.goal_range,
+                        self.pos,
+                        self.range,
                         Some(options),
                     )
                 }
@@ -57,8 +57,8 @@ impl MovementGoal {
                         .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
-                        self.goal_pos,
-                        self.goal_range,
+                        self.pos,
+                        self.range,
                         Some(options),
                     )
                 }
@@ -74,8 +74,8 @@ impl MovementGoal {
                         .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
-                        self.goal_pos,
-                        self.goal_range,
+                        self.pos,
+                        self.range,
                         Some(options),
                     )
                 }
@@ -86,8 +86,8 @@ impl MovementGoal {
                         .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
-                        self.goal_pos,
-                        self.goal_range,
+                        self.pos,
+                        self.range,
                         Some(options),
                     )
                 }
@@ -101,8 +101,8 @@ impl MovementGoal {
                         .heuristic_weight(HEURISTIC_WEIGHT);
                     screeps::pathfinder::search(
                         from_position,
-                        self.goal_pos,
-                        self.goal_range,
+                        self.pos,
+                        self.range,
                         Some(options),
                     )
                 }
@@ -115,7 +115,7 @@ impl MovementGoal {
                 "incomplete search! {} {} {}",
                 search_result.ops(),
                 search_result.cost(),
-                self.goal_pos
+                self.pos
             );
         }
         // start cursor from the current postion

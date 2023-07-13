@@ -15,11 +15,11 @@ use crate::{
 };
 
 mod callbacks;
-mod movement_goal;
+mod goal;
 mod path_state;
 
 pub use callbacks::*;
-pub use movement_goal::MovementGoal;
+pub use goal::MovementGoal;
 pub use path_state::PathState;
 
 // enum for the different speeds available to creeps
@@ -140,7 +140,7 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
                 // it can move - check if it has somewhere to be, and mark it as idle if not
                 if let Some(movement_goal) = worker_state.movement_goal.take() {
                     // we have a goal; first check if it's met
-                    if position.get_range_to(movement_goal.goal_pos) <= movement_goal.goal_range {
+                    if position.get_range_to(movement_goal.pos) <= movement_goal.range {
                         // goal is met! unset the path_state if there is one and idle
                         worker_state.path_state = None;
                         idle_creeps.insert(position, worker_reference);
@@ -152,7 +152,9 @@ pub fn run_movement_and_remove_worker_refs(shard_state: &mut ShardState) {
                                 // (or the stuck count if we didn't move)
                                 path_state.check_if_moved_and_update_pos(position);
 
-                                if path_state.goal == movement_goal
+                                // check only for equality of the goal position as opposed to the whole goal
+                                // so that changes in the avoid_creeps state don't invoke a repath
+                                if path_state.goal.pos == movement_goal.pos
                                     && path_state.stuck_count <= STUCK_REPATH_THRESHOLD
                                 {
                                     // still has the same goal as the cached path; we're ok

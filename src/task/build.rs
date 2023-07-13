@@ -25,8 +25,8 @@ pub fn build(
                             let avoid_creeps = creep.pos().get_range_to(construction_site.pos())
                                 == RANGED_OUT_OF_RANGE;
                             let move_goal = MovementGoal {
-                                goal_pos: construction_site.pos(),
-                                goal_range: 1,
+                                pos: construction_site.pos(),
+                                range: 1,
                                 profile: movement_profile,
                                 avoid_creeps,
                             };

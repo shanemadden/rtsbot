@@ -67,8 +67,8 @@ impl Task {
                     TaskResult::Complete
                 } else {
                     TaskResult::MoveMeTo(MovementGoal {
-                        goal_pos: *position,
-                        goal_range: *range,
+                        pos: *position,
+                        range: *range,
                         profile: movement_profile,
                         avoid_creeps: false,
                     })

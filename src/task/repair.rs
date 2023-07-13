@@ -22,8 +22,8 @@ pub fn repair(
                         let avoid_creeps =
                             creep.pos().get_range_to(target_structure.pos()) == RANGED_OUT_OF_RANGE;
                         let move_goal = MovementGoal {
-                            goal_pos: target_structure.pos(),
-                            goal_range: 1,
+                            pos: target_structure.pos(),
+                            range: 1,
                             profile: movement_profile,
                             avoid_creeps,
                         };
