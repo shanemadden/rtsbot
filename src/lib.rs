@@ -126,6 +126,7 @@ pub fn game_loop() {
     let tick = game::time();
     info!("tick {} starting! CPU: {:.4}", tick, game::cpu::get_used());
 
+    panic!("kaboom");
     // SAFETY: only one instance of the game loop can be running at a time
     // We must use this same mutable reference throughout the entire tick,
     // as any other access to it would cause undefined behavior!
