@@ -16,7 +16,7 @@ use crate::{
 pub fn take_from_resource(
     worker: &WorkerReference,
     target: &ObjectId<Resource>,
-    movement_profile: MovementProfile,
+    _movement_profile: MovementProfile,
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
@@ -28,7 +28,8 @@ pub fn take_from_resource(
                             let move_goal = MovementGoal {
                                 pos: resource.pos(),
                                 range: 1,
-                                profile: movement_profile,
+                                // store is empty, no fatigue from carry parts - override with 5:1
+                                profile: MovementProfile::SwampFiveToOne,
                                 avoid_creeps: false,
                             };
                             TaskResult::MoveMeTo(move_goal)
@@ -38,7 +39,7 @@ pub fn take_from_resource(
                         ErrorCode::Full => TaskResult::Complete,
                         e => {
                             // failed for some other reason?
-                            info!("pickup failure: {:?}", e);
+                            warn!("pickup unhandled failure: {:?}", e);
                             TaskResult::Complete
                         }
                     },
@@ -54,7 +55,7 @@ pub fn take_from_structure(
     worker: &WorkerReference,
     target: ObjectId<Structure>,
     resource_type: ResourceType,
-    movement_profile: MovementProfile,
+    _movement_profile: MovementProfile,
 ) -> TaskResult {
     match worker {
         WorkerReference::Creep(creep) => match target.resolve() {
@@ -68,7 +69,8 @@ pub fn take_from_structure(
                                 let move_goal = MovementGoal {
                                     pos: structure_object.pos(),
                                     range: 1,
-                                    profile: movement_profile,
+                                    // store is empty, no fatigue from carry parts - override with 5:1
+                                    profile: MovementProfile::SwampFiveToOne,
                                     avoid_creeps: false,
                                 };
                                 TaskResult::MoveMeTo(move_goal)
@@ -78,14 +80,13 @@ pub fn take_from_structure(
                             ErrorCode::Full => TaskResult::Complete,
                             e => {
                                 // failed for some other reason?
-                                info!("withdraw failure: {:?}", e);
+                                warn!("withdraw unhandled failure: {:?}", e);
                                 TaskResult::Complete
                             }
                         },
                     },
                     None => {
-                        // failed for some other reason?
-                        info!("withdraw attempted from structure without store?");
+                        warn!("withdraw attempted from structure without store?");
                         TaskResult::Complete
                     }
                 }
@@ -124,14 +125,13 @@ pub fn deliver_to_structure(
                             ErrorCode::Full => TaskResult::Complete,
                             e => {
                                 // failed for some other reason?
-                                info!("transfer failure: {:?}", e);
+                                warn!("transfer unhandled failure: {:?}", e);
                                 TaskResult::Complete
                             }
                         },
                     },
                     None => {
-                        // failed for some other reason?
-                        info!("transfer attempted to structure without store?");
+                        warn!("transfer attempted to structure without store?");
                         TaskResult::Complete
                     }
                 }

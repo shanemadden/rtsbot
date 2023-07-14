@@ -39,7 +39,7 @@ pub fn build(
                         }
                         e => {
                             // failed for some other reason?
-                            info!("build failure: {:?}", e);
+                            info!("build unhandled failure: {:?}", e);
                             TaskResult::Complete
                         }
                     },
