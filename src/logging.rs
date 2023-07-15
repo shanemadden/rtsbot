@@ -84,14 +84,22 @@ fn panic_hook(info: &PanicInfo) {
     if SHOW_BACKTRACE {
         Error::stack_trace_limit(10000_f32);
         let stack = Error::new().stack();
-        // skip all frames before the special symbol `backtrace::__rust_end_short_backtrace`
-        // and then skip that frame too
-        for line in stack
-            .lines()
-            .skip_while(|line| !line.contains("backtrace::__rust_end_short_backtrace"))
-            .skip(1)
-        {
-            let _ = writeln!(fmt_error, "{}", line);
+        // Skip all frames before the special symbol `__rust_end_short_backtrace`
+        // and then skip that frame too.
+        // Note: sometimes wasm-opt seems to delete that symbol.
+        if stack.contains("__rust_end_short_backtrace") {
+            for line in stack
+                .lines()
+                .skip_while(|line| !line.contains("__rust_end_short_backtrace"))
+                .skip(1)
+            {
+                let _ = writeln!(fmt_error, "{}", line);
+            }
+        } else {
+            // If there was no `__rust_end_short_backtrace` symbol, use the whole stack
+            // but skip the first line, it just says Error.
+            let (_, stack) = stack.split_once("\n").unwrap();
+            let _ = writeln!(fmt_error, "{}", stack);
         }
     }
 
