@@ -1,9 +1,11 @@
-use std::panic;
+use core::panic::PanicInfo;
+use std::{fmt::Write, panic};
 
 use log::*;
 use js_sys::JsString;
 use screeps::game;
 use web_sys::console;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 pub use log::LevelFilter::*;
 
@@ -55,13 +57,10 @@ pub fn setup_logging(verbosity: log::LevelFilter) {
     panic::set_hook(Box::new(panic_hook));
 }
 
-use core::panic::PanicInfo;
-use std::fmt::Write;
-
 fn panic_hook(info: &PanicInfo) {
     // import JS Error API to get backtrace info (backtraces don't work in wasm)
     // Node 8 does support this API: https://nodejs.org/docs/latest-v8.x/api/errors.html#errors_error_stack
-    use wasm_bindgen::prelude::wasm_bindgen;
+    
     #[wasm_bindgen]
     extern "C" {
         type Error;
@@ -98,5 +97,3 @@ fn panic_hook(info: &PanicInfo) {
 
     error!("{}", fmt_error);
 }
-
-

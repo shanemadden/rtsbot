@@ -4,11 +4,6 @@ let wasm_module;
 // replace this with the name of your module
 const MODULE_NAME = "screeps-starter-rust";
 
-function console_error(...args) {
-    console.log(...args);
-    Game.notify(args.join(' '));
-}
-
 let log_setup_done = false;
 let halt_next_tick = false;
 
@@ -62,15 +57,13 @@ module.exports.loop = function () {
                 wasm_module.loop();
             }
         } catch (error) {
-            console_error("caught exception:", error);
-            if (error.stack) {
-                console_error("stack trace:", error.stack);
-            }
-            console_error("resetting VM next tick.");
             // if we call `Game.cpu.halt();` this tick, console output from the tick (including the
             // stack trace) is not shown due to those contents being copied post-tick (and the halt
             // function destroying the environment immediately)
             halt_next_tick = true;
+            // we've already logged the stack trace from rust via the panic hook, just write one
+            // last log making the plan to destroy the next tick abundantly clear
+            console.log("resetting VM next tick");
         }
     }
 }
