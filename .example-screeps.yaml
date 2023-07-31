@@ -7,13 +7,13 @@ servers:
   season:
     host: screeps.com
     secure: true
-    token: 'token from https://screeps.com/a/#!/account/auth-tokens'
+    token: "token from https://screeps.com/a/#!/account/auth-tokens"
     path: /season
     branch: default
   ptr:
     host: screeps.com
     secure: true
-    token: 'token from https://screeps.com/a/#!/account/auth-tokens'
+    token: "token from https://screeps.com/a/#!/account/auth-tokens"
     path: /ptr
     branch: default
   pserver:
@@ -36,4 +36,5 @@ configs:
     # global options that should be set on all servers
     '*': ["--config", "build.rustflags=['-Ctarget-cpu=mvp']", "-Z", "build-std=std,panic_abort"]
     # and options to be set per-server (merged onto the global options)
-    ptr: ["--features", "sim"]
+    season: ["--features", "my-season-crate-feature"]
+    ptr: ["--features", "path-visuals"]
