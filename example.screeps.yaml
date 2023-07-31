@@ -1,0 +1,39 @@
+servers:
+  mmo:
+    host: screeps.com
+    secure: true
+    token: "token from https://screeps.com/a/#!/account/auth-tokens"
+    branch: default
+  season:
+    host: screeps.com
+    secure: true
+    token: 'token from https://screeps.com/a/#!/account/auth-tokens'
+    path: /season
+    branch: default
+  ptr:
+    host: screeps.com
+    secure: true
+    token: 'token from https://screeps.com/a/#!/account/auth-tokens'
+    path: /ptr
+    branch: default
+  pserver:
+    host: 127.0.0.1
+    port: 21025
+    secure: false
+    username: "your username (case sensitive!)"
+    password: "your password"
+    branch: default
+configs:
+  # for each server, whether to run terser
+  terser:
+    # set a default (defaults to false if not present)
+    '*': false
+    # override the default for a given server
+    mmo: true
+    season: true
+  # for each server, additional flags to pass to wasm-pack on the command line
+  wasm-pack-options:
+    # global options that should be set on all servers
+    '*': []
+    # and options to be set per-server (merged onto the global options)
+    ptr: ["--features", "no_web"]

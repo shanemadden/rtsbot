@@ -121,8 +121,8 @@ pub struct ColonyState {
 }
 
 // to use a reserved name as a function name, use `js_name`:
-#[wasm_bindgen(js_name = loop)]
-pub fn game_loop() {
+#[wasm_bindgen]
+pub fn wasm_loop() {
     let tick = game::time();
     info!("tick {} starting! CPU: {:.4}", tick, game::cpu::get_used());
 
