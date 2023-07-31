@@ -34,6 +34,6 @@ configs:
   # for each server, additional flags to pass to wasm-pack on the command line
   wasm-pack-options:
     # global options that should be set on all servers
-    '*': []
+    '*': ["--config", "build.rustflags=['-Ctarget-cpu=mvp']", "-Z", "build-std=std,panic_abort"]
     # and options to be set per-server (merged onto the global options)
-    ptr: ["--features", "no_web"]
+    ptr: ["--features", "sim"]

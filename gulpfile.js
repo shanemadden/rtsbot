@@ -9,7 +9,7 @@ const rollup = require('rollup');
 const copy = require('rollup-plugin-copy');
 const node_resolve = require('@rollup/plugin-node-resolve');
 const screeps = require('rollup-plugin-screeps');
-const terser = require('rollup-plugin-terser').terser;
+const terser = require('@rollup/plugin-terser');
 
 // config object for rollup-plugin-screeps 
 let screeps_config;

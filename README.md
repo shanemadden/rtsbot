@@ -1,48 +1,42 @@
 # screeps-starter-rust
 
-Starter Rust AI for [Screeps: World][screeps], the JavaScript-based MMO game.
+Example Rust AI for [Screeps: World][screeps], the JavaScript-based MMO game.
 
 This uses the [`screeps-game-api`] bindings from the [rustyscreeps] organization.
 
-While it's possible to compile using [`wasm-pack`] directly using the Node.js target,
-some modifications are needed to load the output within the Screep environment, so it's
-recommended to use [`cargo-screeps`] for building and deploying your code.
-
-The documentation is currently a bit sparse. API docs which list functions one
-can use are located at https://docs.rs/screeps-game-api/.
-
-Almost all crates on https://crates.io/ are usable (only things which interact with OS
-apis are broken).
-
-Quickstart:
+Instead of `cargo-screeps`, this example uses `gulp`, `wasm-pack`, `rollup`, and
+`rollup-plugin-screeps` for building and deploying the code.
 
 ```sh
-# Install CLI dependency:
-cargo install cargo-screeps
+# Install rustup: https://rustup.rs/
 
-# Clone the starter
-git clone https://github.com/rustyscreeps/screeps-starter-rust.git
-cd screeps-starter-rust
+# Install wasm-pack
+cargo install wasm-pack
 
-# Copy the example config, and set up at least one deployment mode
-cp example-screeps.toml screeps.toml
-nano screeps.toml
-# configure credentials (API key) if you'd like to upload directly,
-# or a directory to copy to if you'd prepfer to use the game client to deploy
+# Install nvm: https://github.com/nvm-sh/nvm
+# (Windows: https://github.com/coreybutler/nvm-windows)
 
-# build tool:
-cargo screeps --help
-# compile the module without deploying anywhere
-cargo screeps build
-# compile plus deploy to the configured 'upload' mode; any section name you
-# set up in your screeps.toml for different environments and servers can be used
-cargo screeps deploy -m upload
-# or if you've set a default mode in your configuration, simply use:
-cargo screeps deploy
+# Install node at version 16 (broken at 20, todo figure out exactly what breaks)
+nvm install 16
+nvm use 16
+
+# Install deps
+npm install
+
+# Install gulp
+npm install --global gulp-cli
+
+# Set up for upload
+cp .example-screeps.yaml .screeps.yaml
+# (edit file, add API key etc)
+
+# build to `dist` directory
+gulp
+
+# deploy to a configured server
+gulp --dest mmo
 ```
 
 [screeps]: https://screeps.com/
-[`wasm-pack`]: https://rustwasm.github.io/wasm-pack/
-[`cargo-screeps`]: https://github.com/rustyscreeps/cargo-screeps/
 [`screeps-game-api`]: https://github.com/rustyscreeps/screeps-game-api/
 [rustyscreeps]: https://github.com/rustyscreeps/
