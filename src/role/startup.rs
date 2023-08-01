@@ -12,23 +12,23 @@ use screeps::{
 };
 
 use crate::{
-    constants::*, role::WorkerRole, task::Task, worker::Worker,
+    constants::*, movement::MovementProfile, role::WorkerRole, task::Task, worker::Worker,
 };
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
-pub struct Builder {
+pub struct Startup {
     #[serde(rename = "r")]
     pub home_room: RoomName,
-    #[serde(rename = "w")]
-    pub repair_watermark: u32,
+    #[serde(rename = "i")]
+    pub id: u8,
 }
 
-impl Worker for Builder {
+impl Worker for Startup {
     fn find_task(&self, store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         match game::rooms().get(self.home_room) {
             Some(room) => {
                 if store.get_used_capacity(Some(ResourceType::Energy)) > 0 {
-                    find_build_or_repair_task(&room, self.repair_watermark)
+                    find_build_or_repair_task(&room, 10_000)
                 } else {
                     find_energy_or_source(&room)
                 }
@@ -40,9 +40,13 @@ impl Worker for Builder {
         }
     }
 
+    fn get_movement_profile(&self) -> MovementProfile {
+        MovementProfile::PlainsOneToOne
+    }
+
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
         use Part::*;
-        vec![Move, Carry, Work]
+        vec![Move, Move, Carry, Work]
     }
 }
 

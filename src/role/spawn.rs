@@ -24,11 +24,29 @@ impl Worker for Spawn {
         let room = game::rooms()
             .get(self.room)
             .expect("expected room for active spawn");
-        let repair_watermark = match room
+        let room_level = room
             .controller()
             .expect("expected controller in room with spawn")
-            .level()
-        {
+            .level();
+
+        if room_level < 3 {
+            // just make sure there's a bunch of startup creeps or else return idle
+            for i in 0..STARTUP_RCL1_COUNT_TARGET {
+                // check up until our max count, ensuring each one exists
+                let startup_role = WorkerRole::Startup(Startup {
+                    home_room: self.room,
+                    id: i,
+                });
+                if !worker_roles.contains(&startup_role) {
+                    return Task::SpawnCreep(startup_role);
+                }
+            }
+
+            // we only want starter creeps, idle
+            return Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)
+        }
+        
+        let repair_watermark = match room_level {
             1 => REPAIR_WATERMARK_RCL_1,
             2 => REPAIR_WATERMARK_RCL_2,
             3 => REPAIR_WATERMARK_RCL_3,
@@ -46,8 +64,7 @@ impl Worker for Spawn {
         if !room.find(find::MY_CONSTRUCTION_SITES, None).is_empty() {
             should_ensure_builder = true;
         } else {
-            // check for repairable structures
-
+            // check for repairable structuresa
             for structure_object in room.find(find::STRUCTURES, None) {
                 let structure = structure_object.as_structure();
                 let hits = structure.hits();

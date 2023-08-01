@@ -36,6 +36,18 @@ mod constants {
     pub const BUILDER_ENERGY_PICKUP_THRESHOLD: u32 = 100;
     /// Builder role considers energy for withdraw from structures above this amount
     pub const BUILDER_ENERGY_WITHDRAW_THRESHOLD: u32 = 1_000;
+    /// Cost of each set of hauler body parts (2 carry, 1 move)
+    pub const HAULER_COST_PER_MULTIPLIER: u32 = Carry.cost() * 2 + Move.cost();
+    /// Count of parts in the hauler body set
+    pub const HAULER_PARTS_PER_MULTIPLIER: u32 = 3;
+    /// How many haulers to try to keep alive in each room
+    pub const HAULER_COUNT_TARGET: u8 = 1;
+    /// Largest number of sets to allow a hauler to be spawned with
+    pub const HAULER_MAX_MULTIPLIER: u32 = MAX_CREEP_SIZE / HAULER_PARTS_PER_MULTIPLIER;
+    /// Hauler role considers energy on the ground for grabbing above this amount
+    pub const HAULER_ENERGY_PICKUP_THRESHOLD: u32 = 35;
+    /// Hauler role considers energy for withdraw from structures above this amount
+    pub const HAULER_ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
     /// Builder role repair maximum at RCL1
     pub const REPAIR_WATERMARK_RCL_1: u32 = 10_000;
     /// Builder role repair maximum at RCL2
@@ -52,18 +64,8 @@ mod constants {
     pub const REPAIR_WATERMARK_RCL_7: u32 = 1_000_000;
     /// Builder role repair maximum at RCL8
     pub const REPAIR_WATERMARK_RCL_8: u32 = 3_000_000;
-    /// Cost of each set of hauler body parts (2 carry, 1 move)
-    pub const HAULER_COST_PER_MULTIPLIER: u32 = Carry.cost() * 2 + Move.cost();
-    /// Count of parts in the hauler body set
-    pub const HAULER_PARTS_PER_MULTIPLIER: u32 = 3;
-    /// How many haulers to try to keep alive in each room
-    pub const HAULER_COUNT_TARGET: u8 = 1;
-    /// Largest number of sets to allow a hauler to be spawned with
-    pub const HAULER_MAX_MULTIPLIER: u32 = MAX_CREEP_SIZE / HAULER_PARTS_PER_MULTIPLIER;
-    /// Hauler role considers energy on the ground for grabbing above this amount
-    pub const HAULER_ENERGY_PICKUP_THRESHOLD: u32 = 35;
-    /// Hauler role considers energy for withdraw from structures above this amount
-    pub const HAULER_ENERGY_WITHDRAW_THRESHOLD: u32 = 500;
+    /// How many do-it-all creeps to keep alive at RCL 1
+    pub const STARTUP_RCL1_COUNT_TARGET: u8 = 15;
     /// How many upgraders to try to keep alive in each room
     pub const UPGRADER_COUNT_TARGET: u8 = 4;
     /// Upgrader roler considers energy for withdraw from structures above this amount

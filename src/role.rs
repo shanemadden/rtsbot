@@ -15,12 +15,18 @@ mod builder;
 mod hauler;
 mod source_harvester;
 mod spawn;
+mod startup;
 mod tower;
 mod upgrader;
 
 pub use self::{
-    builder::Builder, hauler::Hauler, source_harvester::SourceHarvester, spawn::Spawn,
-    tower::Tower, upgrader::Upgrader,
+    builder::Builder,
+    hauler::Hauler,
+    source_harvester::SourceHarvester,
+    spawn::Spawn,
+    startup::Startup,
+    tower::Tower,
+    upgrader::Upgrader,
 };
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
@@ -56,27 +62,23 @@ impl Worker for SpawningCreep {
 #[enum_dispatch(Worker)]
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum WorkerRole {
-    // Creep worker types, with assigned room name
-    // and a unique number for when there might be multiple
     #[serde(rename = "🛠")]
     Builder(Builder),
     #[serde(rename = "🧙")]
     Upgrader(Upgrader),
     #[serde(rename = "🐿")]
     Hauler(Hauler),
-    // static harvester that gets a pre-assigned source for life,
-    // so we just give it a position of the destination source
     #[serde(rename = "⛏")]
     SourceHarvester(SourceHarvester),
+    #[serde(rename = "🐜")]
+    Startup(Startup),
 
-    // structures with worker roles
+    // structures
     Spawn(Spawn),
     Tower(Tower),
 
-    // when an invalid creep name is found,
-    // this role is assigned so the creep can complain about it!
+    // creeps with unparseable names
     Invalid(Invalid),
-    // and this special case is for all spawning creeps, which will change
-    // to their normal role after spawning
+    // spawning creeps
     SpawningCreep(SpawningCreep),
 }
