@@ -113,10 +113,11 @@ impl WorkerState {
     pub fn new_with_role_and_reference(
         role: WorkerRole,
         worker_reference: WorkerReference,
+        task_queue: VecDeque<Task>,
     ) -> WorkerState {
         WorkerState {
             role,
-            task_queue: VecDeque::new(),
+            task_queue,
             worker_reference: Some(worker_reference),
             movement_goal: None,
             path_state: None,
@@ -142,35 +143,36 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
                 worker_state.worker_reference = Some(WorkerReference::Creep(creep.clone()))
             })
             .or_insert_with(|| {
-                if creep.spawning() {
-                    // insert the stub worker, which will be destroyed once spawning is completed
-                    let role = WorkerRole::SpawningCreep(SpawningCreep {});
-                    WorkerState::new_with_role_and_reference(role, WorkerReference::Creep(creep))
-                } else {
-                    // not spawning, give it the role declared in its name
-                    let creep_name = creep.name();
-                    match serde_json::from_str(&creep_name) {
-                        Ok(role) => {
-                            // add to hashset where we track which roles are filled by active workers
-                            shard_state.worker_roles.insert(role);
-                            // then create the state struct
-                            WorkerState::new_with_role_and_reference(
-                                role,
-                                WorkerReference::Creep(creep),
-                            )
-                        }
-                        Err(e) => {
-                            warn!("couldn't parse creep name {}: {:?}", creep_name, e);
-                            // special case, don't insert to the hashset where we track roles, since
-                            // this isn't a valid role
-                            let role = WorkerRole::Invalid(Invalid {});
-                            WorkerState {
-                                role,
-                                task_queue: VecDeque::new(),
-                                worker_reference: Some(WorkerReference::Creep(creep)),
-                                movement_goal: None,
-                                path_state: None,
-                            }
+                let creep_name = creep.name();
+                match serde_json::from_str(&creep_name) {
+                    Ok(role) => {
+                        let task_queue = if creep.spawning() {
+                            let mut queue = VecDeque::new();
+                            queue.push_front(Task::WaitToSpawn);
+                            queue
+                        } else {
+                            VecDeque::new()
+                        };
+                        // add to hashset where we track which roles are filled by active workers
+                        shard_state.worker_roles.insert(role);
+                        // then create the state struct
+                        WorkerState::new_with_role_and_reference(
+                            role,
+                            WorkerReference::Creep(creep),
+                            task_queue,
+                        )
+                    }
+                    Err(e) => {
+                        warn!("couldn't parse creep name {}: {:?}", creep_name, e);
+                        // special case, don't insert to the hashset where we track roles, since
+                        // this isn't a valid role
+                        let role = WorkerRole::Invalid(Invalid {});
+                        WorkerState {
+                            role,
+                            task_queue: VecDeque::new(),
+                            worker_reference: Some(WorkerReference::Creep(creep)),
+                            movement_goal: None,
+                            path_state: None,
                         }
                     }
                 }
@@ -198,6 +200,7 @@ pub fn scan_and_register_structures(shard_state: &mut ShardState) {
                         let worker_state = WorkerState::new_with_role_and_reference(
                             role,
                             WorkerReference::Spawn(spawn),
+                            VecDeque::new(),
                         );
                         shard_state.worker_state.insert(id, worker_state);
                     }
@@ -207,6 +210,7 @@ pub fn scan_and_register_structures(shard_state: &mut ShardState) {
                         let worker_state = WorkerState::new_with_role_and_reference(
                             role,
                             WorkerReference::Tower(tower),
+                            VecDeque::new(),
                         );
                         shard_state.worker_state.insert(id, worker_state);
                     }

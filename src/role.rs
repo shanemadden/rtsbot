@@ -43,19 +43,6 @@ impl Worker for Invalid {
     }
 }
 
-#[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
-pub struct SpawningCreep {}
-
-impl Worker for SpawningCreep {
-    fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
-        Task::WaitToSpawn
-    }
-
-    fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
-        panic!("can't spawn spawning workers!")
-    }
-}
-
 /// represents all types of worker role, along with
 /// any embedded data needed for the worker to rebuild its state;
 /// the serialized version of these are used for creep names
@@ -79,6 +66,4 @@ pub enum WorkerRole {
 
     // creeps with unparseable names
     Invalid(Invalid),
-    // spawning creeps
-    SpawningCreep(SpawningCreep),
 }
