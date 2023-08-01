@@ -28,7 +28,7 @@ impl Worker for Startup {
         match game::rooms().get(self.home_room) {
             Some(room) => {
                 if store.get_used_capacity(Some(ResourceType::Energy)) > 0 {
-                    find_supply_or_build_or_repair_task(&room)
+                    find_startup_task(&room)
                 } else {
                     find_energy_or_source(&room)
                 }
@@ -50,7 +50,7 @@ impl Worker for Startup {
     }
 }
 
-fn find_supply_or_build_or_repair_task(room: &Room) -> Task {
+fn find_startup_task(room: &Room) -> Task {
     // look for supply tasks a spawn or extension
     for structure in room.find(find::STRUCTURES, None) {
         let (store, structure) = match structure {
@@ -97,6 +97,11 @@ fn find_supply_or_build_or_repair_task(room: &Room) -> Task {
     {
         // we can unwrap this id because we know the room the site is in must be visible
         return Task::Build(construction_site.try_id().unwrap());
+    }
+
+    // finally, upgrade
+    if let Some(controller) = room.controller() {
+        return Task::Upgrade(controller.id())
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)
