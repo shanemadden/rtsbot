@@ -32,6 +32,7 @@ pub fn build(
                             };
                             TaskResult::MoveMeTo(move_goal)
                         }
+                        ErrorCode::NotEnough => TaskResult::Complete,
                         ErrorCode::InvalidTarget => {
                             // creep's standing on the construction site, and it's not walkable
                             // should maybe make it flee..
