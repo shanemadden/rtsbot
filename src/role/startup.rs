@@ -28,7 +28,7 @@ impl Worker for Startup {
         match game::rooms().get(self.home_room) {
             Some(room) => {
                 if store.get_used_capacity(Some(ResourceType::Energy)) > 0 {
-                    find_build_or_repair_task(&room, 10_000)
+                    find_supply_or_build_or_repair_task(&room)
                 } else {
                     find_energy_or_source(&room)
                 }
@@ -50,8 +50,26 @@ impl Worker for Startup {
     }
 }
 
-fn find_build_or_repair_task(room: &Room, repair_watermark: u32) -> Task {
-    // look for repair tasks first
+fn find_supply_or_build_or_repair_task(room: &Room) -> Task {
+    // look for supply tasks a spawn or extension
+    for structure in room.find(find::STRUCTURES, None) {
+        let (store, structure) = match structure {
+            // for the three object types that are important to fill, snag their store then cast
+            // them right back to StructureObject
+            StructureObject::StructureSpawn(ref o) => (o.store(), structure),
+            StructureObject::StructureExtension(ref o) => (o.store(), structure),
+            _ => {
+                // no need to deliver to any other structures with these little ones
+                continue
+            },
+        };
+
+        if store.get_free_capacity(Some(ResourceType::Energy)) > 0 {
+            return Task::DeliverToStructure(structure.as_structure().id(), ResourceType::Energy);
+        }
+    }
+
+    // look for repair tasks
     // note that we're using STRUCTURES instead of MY_STRUCTURES
     // so we can catch roads, containers, and walls
     for structure_object in room.find(find::STRUCTURES, None) {
@@ -65,7 +83,7 @@ fn find_build_or_repair_task(room: &Room, repair_watermark: u32) -> Task {
         if hits_max != 0 {
             // if the hits are below our 'watermark' to repair to
             // as well as less than half of this struture's max, repair!
-            if hits < repair_watermark && hits * 2 < hits_max {
+            if hits < 10_000 && hits * 2 < hits_max {
                 return Task::Repair(structure.id());
             }
         }
