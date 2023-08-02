@@ -29,6 +29,7 @@ pub fn upgrade(
                         };
                         TaskResult::MoveMeTo(move_goal)
                     }
+                    ErrorCode::NotEnough => TaskResult::Complete,
                     e => {
                         info!("upgrade failure: {:?}", e);
                         TaskResult::Complete
