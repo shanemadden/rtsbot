@@ -50,9 +50,9 @@ module.exports.loop = function () {
                 // that can potentially cause the module to be unable to load if it's too heavy,
                 // and trap the load cycle with no bucket to recover
                 let wasm_bytes = require(MODULE_NAME);
-                // setup wasm instance
+                // compile wasm module from bytes
                 let wasm_module = new WebAssembly.Module(wasm_bytes);
-                // initialize the module
+                // initialize the module instance with its imports
                 wasm_instance = initSync(wasm_module);
                 // run logging setup - then mark it as done only after it returns, since running out
                 // of CPU time is possible at any time here
