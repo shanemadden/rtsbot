@@ -42,7 +42,6 @@ pub fn harvest_energy_until_full(
                             };
                             TaskResult::MoveMeTo(move_goal)
                         }
-                        ErrorCode::InvalidTarget => TaskResult::Complete,
                         ErrorCode::NotEnough => TaskResult::Complete,
                         e => {
                             // failed for some other reason?
@@ -78,8 +77,7 @@ pub fn harvest_energy_forever(
                             };
                             TaskResult::MoveMeTo(move_goal)
                         }
-                        ErrorCode::InvalidTarget => TaskResult::Complete,
-                        ErrorCode::NotEnough => TaskResult::Complete,
+                        ErrorCode::NotEnough => TaskResult::StillWorking,
                         e => {
                             // failed for some other reason?
                             info!("harvest failure: {:?}", e);
