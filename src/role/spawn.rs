@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
 use screeps::{
+    prelude::*,
     constants::find,
     constants::Part,
     game,
@@ -57,6 +58,16 @@ impl Worker for Spawn {
             _ => REPAIR_WATERMARK_RCL_8,
         };
 
+        // check if we need harvesters
+        for source in room.find(find::SOURCES, None) {
+            let harvester_role = WorkerRole::SourceHarvester(SourceHarvester {
+                source_position: source.pos()
+            });
+            if !worker_roles.contains(&harvester_role) {
+                return Task::SpawnCreep(harvester_role);
+            }
+        }
+
         // determine if we should spawn a builder
         let mut should_ensure_builder = false;
 
@@ -64,7 +75,7 @@ impl Worker for Spawn {
         if !room.find(find::MY_CONSTRUCTION_SITES, None).is_empty() {
             should_ensure_builder = true;
         } else {
-            // check for repairable structuresa
+            // check for repairable structures
             for structure_object in room.find(find::STRUCTURES, None) {
                 let structure = structure_object.as_structure();
                 let hits = structure.hits();
@@ -73,7 +84,7 @@ impl Worker for Spawn {
                 // if hits_max is 0, it's indestructable
                 if hits_max != 0 {
                     // if the hits are below our 'watermark' to repair to
-                    // as well as less than half of this struture's max, repair!
+                    // as well as less than half of this structure's max, repair!
                     if hits < repair_watermark && hits * 2 < hits_max {
                         should_ensure_builder = true;
                         break;
@@ -92,12 +103,6 @@ impl Worker for Spawn {
             }
         }
 
-        // todo - right now we're getting stuck on the hauler task since it can't scale down and the builders don't 
-        // supply the spawn structures. need to split into emergency builders which only happen at low RCL or in emergencies
-        // which supply the spawns then later RCL builders that only build and repair
-
-        // ... then just wrap up getting the source harvesters going at certain RCLs and I think this example bot is
-        // pretty much 'done'
         for i in 0..HAULER_COUNT_TARGET {
             // check up until our max count, ensuring each one exists
             let hauler_role = WorkerRole::Hauler(Hauler {
@@ -119,8 +124,6 @@ impl Worker for Spawn {
                 return Task::SpawnCreep(upgrader_role);
             }
         }
-
-        // todo source harvesters too, look at sources on room if RCL high enough
 
         // last resort, idle
         Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)

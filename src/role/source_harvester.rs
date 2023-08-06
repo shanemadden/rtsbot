@@ -13,7 +13,7 @@ use crate::{role::WorkerRole, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct SourceHarvester {
-    #[serde(rename = "s")]
+    #[serde(rename = "s", with = "screeps::local::serde_position_packed")]
     pub source_position: Position,
 }
 
@@ -29,6 +29,7 @@ impl Worker for SourceHarvester {
     }
 
     fn get_body_for_creep(&self, _spawn: &StructureSpawn) -> Vec<Part> {
-        unimplemented!();
+        use Part::*;
+        vec![Move, Move, Move, Work, Work, Work, Work, Work]
     }
 }
