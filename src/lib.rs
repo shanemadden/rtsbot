@@ -68,6 +68,8 @@ mod constants {
     pub const STARTUP_RCL1_COUNT_TARGET: u8 = 15;
     /// How many upgraders to try to keep alive in each room
     pub const UPGRADER_COUNT_TARGET: u8 = 4;
+    /// Builder role considers energy on the groundfor grabbing above this amount
+    pub const UPGRADER_ENERGY_PICKUP_THRESHOLD: u32 = 100;
     /// Upgrader roler considers energy for withdraw from structures above this amount
     pub const UPGRADER_ENERGY_WITHDRAW_THRESHOLD: u32 = 1_200;
     /// Fill terminals to this much energy

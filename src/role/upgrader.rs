@@ -28,7 +28,7 @@ impl Worker for Upgrader {
                 if store.get_used_capacity(Some(ResourceType::Energy)) > 0 {
                     find_upgrade_task(&room)
                 } else {
-                    find_energy(&room)
+                    find_energy_or_source(&room)
                 }
             }
             None => {
@@ -52,8 +52,17 @@ fn find_upgrade_task(room: &Room) -> Task {
     }
 }
 
-fn find_energy(room: &Room) -> Task {
-    // check structures - containers and terminals only, don't want
+fn find_energy_or_source(room: &Room) -> Task {
+    // check for energy on the ground of sufficient quantity to care about
+    for resource in room.find(find::DROPPED_RESOURCES, None) {
+        if resource.resource_type() == ResourceType::Energy
+            && resource.amount() >= UPGRADER_ENERGY_PICKUP_THRESHOLD
+        {
+            return Task::TakeFromResource(resource.id());
+        }
+    }
+
+    // check structures - filtering for certain types, don't want
     // to have these taking from spawns or extensions!
     for structure in room.find(find::STRUCTURES, None) {
         let store = match &structure {
