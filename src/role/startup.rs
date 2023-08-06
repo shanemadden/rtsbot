@@ -60,8 +60,8 @@ fn find_startup_task(room: &Room) -> Task {
             StructureObject::StructureExtension(ref o) => (o.store(), structure),
             _ => {
                 // no need to deliver to any other structures with these little ones
-                continue
-            },
+                continue;
+            }
         };
 
         if store.get_free_capacity(Some(ResourceType::Energy)) > 0 {
@@ -101,7 +101,7 @@ fn find_startup_task(room: &Room) -> Task {
 
     // finally, upgrade
     if let Some(controller) = room.controller() {
-        return Task::Upgrade(controller.id())
+        return Task::Upgrade(controller.id());
     }
 
     Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)

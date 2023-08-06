@@ -1,11 +1,11 @@
 use core::panic::PanicInfo;
 use std::{fmt::Write, panic};
 
-use log::*;
 use js_sys::JsString;
+use log::*;
 use screeps::game;
-use web_sys::console;
 use wasm_bindgen::prelude::wasm_bindgen;
+use web_sys::console;
 
 pub use log::LevelFilter::*;
 
@@ -60,7 +60,7 @@ pub fn setup_logging(verbosity: log::LevelFilter) {
 fn panic_hook(info: &PanicInfo) {
     // import JS Error API to get backtrace info (backtraces don't work in wasm)
     // Node 8 does support this API: https://nodejs.org/docs/latest-v8.x/api/errors.html#errors_error_stack
-    
+
     #[wasm_bindgen]
     extern "C" {
         type Error;
@@ -98,7 +98,7 @@ fn panic_hook(info: &PanicInfo) {
         } else {
             // If there was no `__rust_end_short_backtrace` symbol, use the whole stack
             // but skip the first line, it just says Error.
-            let (_, stack) = stack.split_once("\n").unwrap();
+            let (_, stack) = stack.split_once('\n').unwrap();
             let _ = writeln!(fmt_error, "{}", stack);
         }
     }

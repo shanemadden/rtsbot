@@ -158,8 +158,6 @@ pub fn wasm_loop() {
     // as well as to enable them to be GC'd and their memory freed in js heap, if js wants to)
     movement::run_movement_and_remove_worker_refs(shard_state);
 
-    //info!("workers {:?}", shard_state.worker_state);
-
     info!(
         "tick {} done! cpu: {:.4}, execution instance age {}",
         tick,

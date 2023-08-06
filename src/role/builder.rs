@@ -11,9 +11,7 @@ use screeps::{
     prelude::*,
 };
 
-use crate::{
-    constants::*, role::WorkerRole, task::Task, worker::Worker,
-};
+use crate::{constants::*, role::WorkerRole, task::Task, worker::Worker};
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Builder {

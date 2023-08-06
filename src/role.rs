@@ -20,13 +20,8 @@ mod tower;
 mod upgrader;
 
 pub use self::{
-    builder::Builder,
-    hauler::Hauler,
-    source_harvester::SourceHarvester,
-    spawn::Spawn,
-    startup::Startup,
-    tower::Tower,
-    upgrader::Upgrader,
+    builder::Builder, hauler::Hauler, source_harvester::SourceHarvester, spawn::Spawn,
+    startup::Startup, tower::Tower, upgrader::Upgrader,
 };
 
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone, Serialize, Deserialize)]

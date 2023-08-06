@@ -2,12 +2,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
 use screeps::{
-    prelude::*,
     constants::find,
     constants::Part,
     game,
     local::RoomName,
     objects::{Store, StructureSpawn},
+    prelude::*,
 };
 
 use crate::{constants::*, role::*, task::Task};
@@ -44,9 +44,9 @@ impl Worker for Spawn {
             }
 
             // we only want starter creeps, idle
-            return Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS)
+            return Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS);
         }
-        
+
         let repair_watermark = match room_level {
             1 => REPAIR_WATERMARK_RCL_1,
             2 => REPAIR_WATERMARK_RCL_2,
@@ -61,7 +61,7 @@ impl Worker for Spawn {
         // check if we need harvesters
         for source in room.find(find::SOURCES, None) {
             let harvester_role = WorkerRole::SourceHarvester(SourceHarvester {
-                source_position: source.pos()
+                source_position: source.pos(),
             });
             if !worker_roles.contains(&harvester_role) {
                 return Task::SpawnCreep(harvester_role);
