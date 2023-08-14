@@ -1,16 +1,16 @@
-const { series, parallel } = require('gulp');
+const gulp = require('gulp');
+const screeps = require('gulp-screeps');
+
+const rollup = require('rollup');
+const copy = require('rollup-plugin-copy');
+const node_resolve = require('@rollup/plugin-node-resolve');
+const terser = require('@rollup/plugin-terser');
+
 const spawn = require('child_process').spawn;
 const del = require('del');
 const fs = require('fs');
 const yaml = require('yaml');
 const argv = require('yargs').argv;
-
-const rollup = require('rollup');
-const copy = require('rollup-plugin-copy');
-const node_resolve = require('@rollup/plugin-node-resolve');
-// work on swapping this out for the gulp plugin that can actually upload wasm
-const screeps = require('rollup-plugin-screeps');
-const terser = require('@rollup/plugin-terser');
 
 // config object for rollup-plugin-screeps 
 let screeps_config;
@@ -37,9 +37,7 @@ async function load_config() {
         extra_options = extra_options.concat(wasm_pack_options["*"])
     }
 
-    if (!argv.dest) {
-        console.log('No --dest specified - code will be compiled but not uploaded!');
-    } else {
+    if (argv.dest) {
         // check for a per-server terser config and override default
         // (or global config)
         if (terser_configs[argv.dest] !== undefined) {
@@ -53,26 +51,19 @@ async function load_config() {
 
         // modify the server config from unified format
         // (https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md)
-        // to the config expected by rollup-plugin-screeps
+        // to the config expected by gulp-screeps: set `email` to `username`
         screeps_config = (config.servers || {})[argv.dest];
         if (screeps_config == null) throw new Error('Missing config for --dest');
-        screeps_config.hostname = screeps_config.host;
-        screeps_config.port = screeps_config.port || (screeps_config.secure ? 443 : 21025);
-        screeps_config.host = `${screeps_config.host}:${screeps_config.port}`;
         screeps_config.email = screeps_config.username;
-        screeps_config.protocol = screeps_config.secure ? 'https' : 'http';
-        screeps_config.path = screeps_config.path || '/';
-        // 'auto' will cause rollup plugin to use the local git branch's name
-        screeps_config.branch = screeps_config.branch || 'auto';
     }
 }
 
-function wasm_pack() {
+function compile_rs() {
     let args = ['run', 'nightly', 'wasm-pack', 'build', '--target', 'web', '--release', ...extra_options];
     return spawn('rustup', args, { stdio: 'inherit' });
 }
 
-async function run_rollup() {
+async function compile_js() {
     const bundle = await rollup.rollup({
         input: './javascript/main.js',
         plugins: [
@@ -87,11 +78,17 @@ async function run_rollup() {
     await bundle.write({
         format: 'cjs',
         file: 'dist/main.js',
-        plugins: [
-            use_terser && terser(),
-            screeps({ config: screeps_config, dryRun: !screeps_config })
-        ]
+        plugins: [use_terser && terser()]
     });
+}
+
+function upload(done) {
+    if (screeps_config) {
+        return gulp.src('dist/*').pipe(screeps(screeps_config));
+    } else {
+        console.log('No --dest specified - not uploading!');
+        done()
+    }
 }
 
 function clean() {
@@ -100,4 +97,4 @@ function clean() {
 
 exports.clean = clean;
 
-exports.default = series(parallel(clean, load_config), wasm_pack, run_rollup);
+exports.default = gulp.series(gulp.parallel(clean, load_config), compile_rs, compile_js, upload);

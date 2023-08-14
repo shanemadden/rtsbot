@@ -28,9 +28,9 @@
     "@rollup/plugin-terser": "^0.4.3",
     "del": "^6.0.0",
     "gulp": "^4.0.2",
+    "gulp-screeps": "^1.1.0",
     "rollup": "^2.50.5",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-screeps": "^1.0.1",
     "yaml": "^1.10.2",
     "yargs": "^17.7.2"
   }
