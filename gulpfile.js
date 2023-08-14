@@ -8,6 +8,7 @@ const argv = require('yargs').argv;
 const rollup = require('rollup');
 const copy = require('rollup-plugin-copy');
 const node_resolve = require('@rollup/plugin-node-resolve');
+// work on swapping this out for the gulp plugin that can actually upload wasm
 const screeps = require('rollup-plugin-screeps');
 const terser = require('@rollup/plugin-terser');
 

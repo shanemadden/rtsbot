@@ -47,6 +47,10 @@ impl Worker for Spawn {
             return Task::IdleUntil(game::time() + NO_TASK_IDLE_TICKS);
         }
 
+        // crap - how we gonna get a watermark from colony state from here (or update it)
+        // persist per room, change this constant to a max, bump it up if the repairer is bored
+        // maybe we don't store it on the repairer's name anymore, can the repairer look it up from the
+        // colony state maybe?
         let repair_watermark = match room_level {
             1 => REPAIR_WATERMARK_RCL_1,
             2 => REPAIR_WATERMARK_RCL_2,
