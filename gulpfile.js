@@ -58,6 +58,10 @@ async function load_config() {
     }
 }
 
+function clear_output() {
+    return del(['dist', 'pkg']);
+}
+
 function compile_rs() {
     let args = ['run', 'nightly', 'wasm-pack', 'build', '--target', 'web', '--release', ...extra_options];
     return spawn('rustup', args, { stdio: 'inherit' });
@@ -69,9 +73,7 @@ async function compile_js() {
         plugins: [
             node_resolve.nodeResolve(),
             copy({
-              targets: [
-                { src: 'pkg/*.wasm', dest: 'dist' }
-              ]
+              targets: [{ src: 'pkg/*.wasm', dest: 'dist' }]
             }),
         ]
     });
@@ -91,10 +93,6 @@ function upload(done) {
     }
 }
 
-function clean() {
-    return del(['dist', 'pkg']);
-}
+exports.clean = clear_output;
 
-exports.clean = clean;
-
-exports.default = gulp.series(gulp.parallel(clean, load_config), compile_rs, compile_js, upload);
+exports.default = gulp.series(gulp.parallel(clear_output, load_config), compile_rs, compile_js, upload);
