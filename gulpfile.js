@@ -10,7 +10,11 @@ const spawn = require('child_process').spawn;
 const del = require('del');
 const fs = require('fs');
 const yaml = require('yaml');
-const argv = require('yargs').argv;
+const argv = require('yargs')
+    .option('upload', {
+        alias: 'u',
+    })
+    .argv;
 
 // config object for rollup-plugin-screeps 
 let screeps_config;
@@ -37,23 +41,23 @@ async function load_config() {
         extra_options = extra_options.concat(wasm_pack_options["*"])
     }
 
-    if (argv.dest) {
+    if (argv.upload) {
         // check for a per-server terser config and override default
         // (or global config)
-        if (terser_configs[argv.dest] !== undefined) {
-            use_terser = terser_configs[argv.dest];
+        if (terser_configs[argv.upload] !== undefined) {
+            use_terser = terser_configs[argv.upload];
         }
 
         // check for per-server wasm-pack options array and add them on
-        if (wasm_pack_options[argv.dest]) {
-            extra_options = extra_options.concat(wasm_pack_options[argv.dest])
+        if (wasm_pack_options[argv.upload]) {
+            extra_options = extra_options.concat(wasm_pack_options[argv.upload])
         }
 
         // modify the server config from unified format
         // (https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md)
         // to the config expected by gulp-screeps: set `email` to `username`
-        screeps_config = (config.servers || {})[argv.dest];
-        if (screeps_config == null) throw new Error('Missing config for --dest');
+        screeps_config = (config.servers || {})[argv.upload];
+        if (screeps_config == null) throw new Error('Missing config section for specified upload destination');
         screeps_config.email = screeps_config.username;
     }
 }
@@ -88,7 +92,7 @@ function upload(done) {
     if (screeps_config) {
         return gulp.src('dist/*').pipe(screeps(screeps_config));
     } else {
-        console.log('No --dest specified - not uploading!');
+        console.log('No --upload destination specified - not uploading!');
         done()
     }
 }
