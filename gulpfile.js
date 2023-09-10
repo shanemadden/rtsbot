@@ -16,8 +16,8 @@ const argv = require('yargs')
     })
     .argv;
 
-// config object for rollup-plugin-screeps 
-let screeps_config;
+// config object for gulp-screeps
+let upload_config;
 // whether to run terser
 let use_terser = false;
 // any additional flags to pass to wasm-pack
@@ -56,9 +56,9 @@ async function load_config() {
         // modify the server config from unified format
         // (https://github.com/screepers/screepers-standards/blob/master/SS3-Unified_Credentials_File.md)
         // to the config expected by gulp-screeps: set `email` to `username`
-        screeps_config = (config.servers || {})[argv.upload];
-        if (screeps_config == null) throw new Error('Missing config section for specified upload destination');
-        screeps_config.email = screeps_config.username;
+        upload_config = (config.servers || {})[argv.upload];
+        if (upload_config == null) throw new Error('Missing config section for specified upload destination');
+        upload_config.email = upload_config.username;
     }
 }
 
@@ -89,8 +89,8 @@ async function compile_js() {
 }
 
 function upload(done) {
-    if (screeps_config) {
-        return gulp.src('dist/*').pipe(screeps(screeps_config));
+    if (upload_config) {
+        return gulp.src('dist/*').pipe(screeps(upload_config));
     } else {
         console.log('No --upload destination specified - not uploading!');
         done()
