@@ -3,11 +3,9 @@
 const MODULE_NAME = "screeps_starter_rust_bg";
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js';
-import { initSync } from '../pkg/screeps_starter_rust.js';
+import * as my_screeps_bot from '../pkg/screeps_starter_rust.js';
 let wasm_instance;
 
-// track whether the logging setup has been done (we only want to run it once per wasm instance)
-let log_setup_done = false;
 // as well as whether the wasm instance has panicked, which triggers us halting the instance on
 // the following tick
 let halt_next_tick = false;
@@ -33,13 +31,7 @@ module.exports.loop = function () {
 
         try {
             if (wasm_instance) {
-                // deal with the case of the wasm init having completed but not having gotten
-                // as far as running the logging setup due to running out of CPU mid-setup prior
-                if (log_setup_done === false) {
-                    wasm_instance.log_setup();
-                    log_setup_done = true;
-                }
-                wasm_instance.wasm_loop();
+                my_screeps_bot.wasm_loop();
             } else {
                 // attempt to load the wasm only if there's lots of bucket
                 if (Game.cpu.bucket < 1000) {
@@ -53,15 +45,11 @@ module.exports.loop = function () {
                 // compile wasm module from bytes
                 let wasm_module = new WebAssembly.Module(wasm_bytes);
                 // initialize the module instance with its imports
-                wasm_instance = initSync(wasm_module);
-                // run logging setup - then mark it as done only after it returns, since running out
-                // of CPU time is possible at any time here
-                wasm_instance.log_setup();
-                log_setup_done = true;
+                wasm_instance = my_screeps_bot.initSync(wasm_module);
                 // keep going into the normal game wasm_loop after setup, it should handle the case of
                 // realizing if the init took a lot of CPU time to make sure we don't use enough in
                 // the first tick to risk an out-of-CPU crash and send us back to reloading
-                wasm_instance.wasm_loop();
+                my_screeps_bot.wasm_loop();
             }
         } catch (error) {
             // if we call `Game.cpu.halt();` this tick, console output from the tick (including the
@@ -70,7 +58,12 @@ module.exports.loop = function () {
             halt_next_tick = true;
             // we've already logged the stack trace from rust via the panic hook, just write one
             // last log making the plan to destroy the next tick abundantly clear
-            console.log("resetting VM next tick");
+            console_error("caught exception, will reset VM next tick: ", error);
+            // not logging stack since the one from rust is generally better and this just adds noise,
+            // but if we need it to debug, uncomment:
+            // if (error.stack) {
+            //    console_error("js stack:", error.stack);
+            // }
         }
     }
 }

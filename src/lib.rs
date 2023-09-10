@@ -82,18 +82,11 @@ mod constants {
     pub const MELEE_OUT_OF_RANGE: u32 = 2;
 }
 
-// add wasm_bindgen to any function you would like to expose for call from js - this one's
-// special and must only be called once, so handling for it is carefully managed in main.js
-#[wasm_bindgen]
-pub fn log_setup() {
-    // show all output of Info level, adjust as needed
-    logging::setup_logging(logging::Info);
-}
-
 // this is one method of persisting data on the wasm memory heap between ticks
 // this is an alternative to keeping state in memory on game objects - but will be lost on
 // global resets, which occur at differing frequencies on different server environments
 static mut SHARD_STATE: Option<ShardState> = None;
+static INIT_LOGGING: std::sync::Once = std::sync::Once::new();
 
 // define the giant struct which holds all of state data we're interested in holding
 // for future ticks
@@ -127,6 +120,11 @@ pub struct ColonyState {
 // to use a reserved name as a function name, use `js_name`:
 #[wasm_bindgen]
 pub fn wasm_loop() {
+    INIT_LOGGING.call_once(|| {
+        // show all output of Info level, adjust as needed
+        logging::setup_logging(logging::Info);
+    });
+
     let tick = game::time();
     info!("tick {} starting! CPU: {:.4}", tick, game::cpu::get_used());
 
