@@ -58,11 +58,11 @@ module.exports.loop = function () {
             halt_next_tick = true;
             // we've already logged the stack trace from rust via the panic hook, just write one
             // last log making the plan to destroy the next tick abundantly clear
-            console_error("caught exception, will reset VM next tick: ", error);
+            console.log("caught exception, will reset VM next tick: ", error);
             // not logging stack since the one from rust is generally better and this just adds noise,
             // but if we need it to debug, uncomment:
             // if (error.stack) {
-            //    console_error("js stack:", error.stack);
+            //    console.log("js stack:", error.stack);
             // }
         }
     }
