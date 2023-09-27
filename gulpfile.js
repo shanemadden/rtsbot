@@ -63,7 +63,7 @@ async function load_config() {
 }
 
 function clear_output() {
-    return del(['dist', 'pkg']);
+    return del(['dist/*', 'pkg/*']);
 }
 
 function compile_rs() {
