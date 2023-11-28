@@ -6,7 +6,7 @@ import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.
 import * as my_screeps_bot from '../pkg/screeps_starter_rust.js';
 let wasm_instance;
 
-// as well as whether the wasm instance has panicked, which triggers us halting the instance on
+// track whether the wasm instance has panicked, which triggers us halting the instance on
 // the following tick
 let halt_next_tick = false;
 
