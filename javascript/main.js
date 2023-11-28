@@ -10,6 +10,26 @@ let wasm_instance;
 // the following tick
 let halt_next_tick = false;
 
+// This provides the function `console.error` that wasm_bindgen sometimes expects to exist,
+// especially with type checks in debug mode. An alternative is to have this be `function () {}`
+// and let the exception handler log the thrown JS exceptions, but there is some additional
+// information that wasm_bindgen only passes here.
+//
+// There is nothing special about this function and it may also be used by any JS/Rust code as a convenience.
+console.error = function () {
+    const processedArgs = _.map(arguments, (arg) => {
+        if (arg instanceof Error) {
+            // On this version of Node, the `stack` property of errors contains
+            // the message as well.
+            return arg.stack;
+        } else {
+            return arg;
+        }
+    }).join(' ');
+    console.log("ERROR:", processedArgs);
+    Game.notify(processedArgs);
+}
+
 module.exports.loop = function () {
     if (halt_next_tick === true) {
         // we've had an error on the last tick; skip execution during the current tick, asking the
