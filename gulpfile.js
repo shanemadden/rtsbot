@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const screeps = require('gulp-screeps');
 
 const rollup = require('rollup');
+const cleanup = require('rollup-plugin-cleanup');
 const copy = require('rollup-plugin-copy');
 const node_resolve = require('@rollup/plugin-node-resolve');
 const terser = require('@rollup/plugin-terser');
@@ -76,6 +77,7 @@ async function compile_js() {
         input: './javascript/main.js',
         plugins: [
             node_resolve.nodeResolve(),
+            cleanup(),
             copy({
               targets: [{ src: 'pkg/*.wasm', dest: 'dist' }]
             }),
