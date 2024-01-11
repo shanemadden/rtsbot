@@ -16,9 +16,9 @@ cargo install wasm-pack
 # Install nvm: https://github.com/nvm-sh/nvm
 # (Windows: https://github.com/coreybutler/nvm-windows)
 
-# Install node at version 16 (broken at 20, todo figure out exactly what breaks)
-nvm install 16
-nvm use 16
+# Install node at version 20
+nvm install 20
+nvm use 20
 
 # Install deps
 npm install
@@ -34,7 +34,7 @@ cp .example-screeps.yaml .screeps.yaml
 gulp
 
 # deploy to a configured server
-gulp --dest mmo
+gulp --upload mmo
 ```
 
 [screeps]: https://screeps.com/
