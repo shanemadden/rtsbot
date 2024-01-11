@@ -120,7 +120,7 @@ impl MovementGoal {
             last_position: from_position,
             // in the rare case we got a zero-step incomplete path, just
             // mark top as the direction we're moving; the path will just fail next tick
-            next_direction: *steps.get(0).unwrap_or(&Direction::Top),
+            next_direction: *steps.first().unwrap_or(&Direction::Top),
             path: steps,
             path_progress: 0,
         }

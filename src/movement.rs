@@ -18,7 +18,6 @@ mod callbacks;
 mod goal;
 mod path_state;
 
-pub use callbacks::*;
 pub use goal::MovementGoal;
 pub use path_state::PathState;
 

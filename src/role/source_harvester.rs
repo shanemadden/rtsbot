@@ -20,7 +20,7 @@ pub struct SourceHarvester {
 impl Worker for SourceHarvester {
     fn find_task(&self, _store: &Store, _worker_roles: &HashSet<WorkerRole>) -> Task {
         match self.source_position.look_for(look::SOURCES) {
-            Ok(sources) => match sources.get(0) {
+            Ok(sources) => match sources.first() {
                 Some(source) => Task::HarvestEnergyForever(source.id()),
                 None => Task::MoveToPosition(self.source_position, 1),
             },

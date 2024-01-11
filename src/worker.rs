@@ -143,7 +143,7 @@ pub fn scan_and_register_creeps(shard_state: &mut ShardState) {
                 worker_state.worker_reference = Some(WorkerReference::Creep(creep.clone()))
             })
             .or_insert_with(|| {
-                let creep_name = creep.name();
+                let creep_name: String = creep.name().into();
                 match serde_json::from_str(&creep_name) {
                     Ok(role) => {
                         let task_queue = if creep.spawning() {
