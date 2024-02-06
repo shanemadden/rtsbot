@@ -4,8 +4,8 @@ Example Rust AI for [Screeps: World][screeps], the JavaScript-based MMO game.
 
 This uses the [`screeps-game-api`] bindings from the [rustyscreeps] organization.
 
-Instead of `cargo-screeps`, this example uses `gulp`, `wasm-pack`, `rollup`, and
-`rollup-plugin-screeps` for building and deploying the code.
+Instead of `cargo-screeps`, this example uses `wasm-pack`, `rollup`, and the
+[`screeps-api`] Node.js package for building and deploying the code.
 
 ```sh
 # Install rustup: https://rustup.rs/
@@ -23,20 +23,15 @@ nvm use 20
 # Install deps
 npm install
 
-# Install gulp
-npm install --global gulp-cli
-
 # Set up for upload
 cp .example-screeps.yaml .screeps.yaml
 # (edit file, add API key etc)
 
-# build to `dist` directory
-gulp
-
 # deploy to a configured server
-gulp --upload mmo
+npm run deploy -- --server mmo
 ```
 
 [screeps]: https://screeps.com/
 [`screeps-game-api`]: https://github.com/rustyscreeps/screeps-game-api/
 [rustyscreeps]: https://github.com/rustyscreeps/
+[`screeps-api`]: https://github.com/screepers/node-screeps-api
