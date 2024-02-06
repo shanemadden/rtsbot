@@ -1,7 +1,10 @@
-use std::collections::{HashMap, HashSet};
 use js_sys::JsString;
 use log::*;
-use screeps::{game, local::{RoomName, RoomCoordinate, Position, RawObjectId}};
+use screeps::{
+    game,
+    local::{Position, RawObjectId, RoomCoordinate, RoomName},
+};
+use std::collections::{HashMap, HashSet};
 use wasm_bindgen::prelude::*;
 
 mod logging;
@@ -12,6 +15,7 @@ mod worker;
 
 use self::{
     role::WorkerRole,
+    task::Task,
     worker::{WorkerId, WorkerState},
 };
 
@@ -118,24 +122,39 @@ pub struct ColonyState {
 }
 
 #[wasm_bindgen]
-pub fn update_selected_object(client_tick: u32, object_id: JsString) {
+pub fn update_selected_object(client_tick: u32, object_id: JsString, object_type: String) {
     let raw_obj: RawObjectId = object_id.try_into().unwrap();
     info!(
-        "selection updated! {} {:?}",
-        client_tick, raw_obj
+        "selection updated! {} {:?} {}",
+        client_tick, raw_obj, object_type
     );
 }
 
 #[wasm_bindgen]
-pub fn right_click_position(room_name: JsString, x: u8, y: u8, object_id: Option<JsString>) {
+pub fn right_click_position(
+    room_name: JsString,
+    x: u8,
+    y: u8,
+    object_id: JsString,
+    object_type: String,
+) {
     let pos = Position::new(
         RoomCoordinate::try_from(x).unwrap(),
         RoomCoordinate::try_from(y).unwrap(),
-        RoomName::try_from(room_name).unwrap());
-    info!("click observed in wasm fn: {}, {:?}", pos, object_id);
+        RoomName::try_from(room_name).unwrap(),
+    );
+    info!("click observed: {}, {} {}", pos, object_id, object_type);
+
+    if object_type == "creep" {
+        let shard_state = unsafe { SHARD_STATE.get_or_insert_with(ShardState::default) };
+        let id_raw: RawObjectId = object_id.try_into().unwrap();
+        shard_state
+            .worker_state
+            .entry(WorkerId::Creep(id_raw.into()))
+            .and_modify(|state| state.task_queue.push_front(Task::MoveToPosition(pos, 0)));
+    }
 }
 
-// to use a reserved name as a function name, use `js_name`:
 #[wasm_bindgen]
 pub fn wasm_loop() {
     INIT_LOGGING.call_once(|| {

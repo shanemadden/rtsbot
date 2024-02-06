@@ -9,11 +9,12 @@ const output = `<span>injecting client scripts...</span>
         if (roomScope.Room.selectedObject) {
             let tick = roomScope.Room.gameTime;
             let object_id = roomScope.Room.selectedObject._id;
+            let object_type = roomScope.Room.selectedObject.type;
             if ((object_id !== window.selection_tracker_object) || (window.selection_tracker_tick && window.selection_tracker_tick + 5 <= tick)) {
                 window.selection_tracker_object = object_id;
                 window.selection_tracker_tick = tick;
                 Api.post('user/console',{
-                    expression: "update_selected_object("+tick+", '"+object_id+"');'client object selection updated';",
+                    expression: "update_selected_object("+tick+", '"+object_id+"', '"+object_type+"');'client object selection updated';",
                     shard: roomScope.Room.shardName,
                     hidden: true
                 });
@@ -23,18 +24,14 @@ const output = `<span>injecting client scripts...</span>
 
     let cursorLayer = angular.element(document.getElementsByClassName("cursor-layer"))[0];
     cursorLayer.addEventListener("contextmenu", function(e){
-        if (roomScope.Room.cursorPos) {
+        if (roomScope.Room.cursorPos && roomScope.Room.selectedObject) {
             e.preventDefault();
             let room_name = roomScope.Room.roomName;
             let x = roomScope.Room.cursorPos.x;
             let y = roomScope.Room.cursorPos.y;
-            let expr;
-            if (roomScope.Room.selectedObject) {
-                let object_id = roomScope.Room.selectedObject._id;
-                expr = "right_click_position('"+room_name+"', "+x+", "+y+", '"+object_id+"');'right click sent';";
-            } else {
-                expr = "right_click_position('"+room_name+"', "+x+", "+y+");'right click sent';";
-            }
+            let object_id = roomScope.Room.selectedObject._id;
+            let object_type = roomScope.Room.selectedObject.type;
+            expr = "right_click_position('"+room_name+"', "+x+", "+y+", '"+object_id+"', '"+object_type+"');'right click sent';";
             Api.post('user/console',{
                 expression: expr,
                 shard: roomScope.Room.shardName,
