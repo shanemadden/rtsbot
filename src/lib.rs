@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
-
+use js_sys::JsString;
 use log::*;
-use screeps::{game, local::RoomName};
+use screeps::{game, local::{RoomName, RoomCoordinate, Position, RawObjectId}};
 use wasm_bindgen::prelude::*;
 
 mod logging;
@@ -115,6 +115,24 @@ impl Default for ShardState {
 
 pub struct ColonyState {
     // todo add stuff here - spawn queue, maybe remote tracking
+}
+
+#[wasm_bindgen]
+pub fn update_selected_object(client_tick: u32, object_id: JsString) {
+    let raw_obj: RawObjectId = object_id.try_into().unwrap();
+    info!(
+        "selection updated! {} {:?}",
+        client_tick, raw_obj
+    );
+}
+
+#[wasm_bindgen]
+pub fn right_click_position(room_name: JsString, x: u8, y: u8, object_id: Option<JsString>) {
+    let pos = Position::new(
+        RoomCoordinate::try_from(x).unwrap(),
+        RoomCoordinate::try_from(y).unwrap(),
+        RoomName::try_from(room_name).unwrap());
+    info!("click observed in wasm fn: {}, {:?}", pos, object_id);
 }
 
 // to use a reserved name as a function name, use `js_name`:

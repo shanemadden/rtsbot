@@ -5,7 +5,12 @@ const MODULE_NAME = "screeps_starter_rust_bg";
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js';
 
+import './client_scripts.js';
 import * as screeps_bot from '../pkg/screeps_starter_rust.js';
+
+// glue functions for client scripts
+global.update_selected_object = screeps_bot.update_selected_object;
+global.right_click_position = screeps_bot.right_click_position;
 
 // This provides the function `console.error` that wasm_bindgen sometimes expects to exist,
 // especially with type checks in debug mode. An alternative is to have this be `function () {}`
