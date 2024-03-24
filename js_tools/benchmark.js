@@ -6,7 +6,7 @@ const axios = require('axios');
 const argv = require('yargs')
   .option('speed', {
     describe: 'target tick duration, in milliseconds',
-    default: 50,
+    default: 1000,
   })
   .option('compose', {
     describe: 'docker-compose file to use',
@@ -14,7 +14,7 @@ const argv = require('yargs')
   })
   .option('max', {
     describe: 'number of ticks to stop after reaching',
-    default: 20000,
+    default: 50000,
   })
   .option('level', {
     describe: 'room controller level to stop after reaching',
