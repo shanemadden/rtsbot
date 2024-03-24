@@ -30,6 +30,11 @@ services:
     volumes:
       - redis-data:/data
 
+  maps-nginx:
+    image: nginx:alpine
+    volumes:
+      - ./assets:/usr/share/nginx/html
+
 volumes:
   screeps-data:
   screeps-mods:
