@@ -32,6 +32,15 @@ cp .example-screeps.yaml .screeps.yaml
 
 # deploy to a configured server
 npm run deploy -- --server mmo
+
+# local benchmarking server under docker
+cp .example-env .env
+# edit .env, add steam api key
+
+# install docker compose
+
+# starts containers, resets server then deploys code, runs until target RCL or tick
+npm run benchmark -- --steamid your-steam-id
 ```
 
 [screeps]: https://screeps.com/

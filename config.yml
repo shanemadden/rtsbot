@@ -1,0 +1,18 @@
+mods:
+  - screepsmod-admin-utils
+  - screepsmod-auth
+  - screepsmod-cli
+  - screepsmod-milestones-history
+  - screepsmod-mongo
+  - '@admon-dev/screepsmod-speedrun'
+
+bots:
+  rtsbot: rtsbot
+
+cli:
+  host: 0.0.0.0
+  port: 21028
+
+launcherOptions:
+  # If set, forward console messages to terminal
+  logConsole: true

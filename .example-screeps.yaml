@@ -16,6 +16,15 @@ servers:
     token: "token from https://screeps.com/a/#!/account/auth-tokens"
     path: /ptr
     branch: default
+  # this config block should not be changed, including the password
+  # the benchmark.js tool explicitly sets the user's password to "insecure"
+  localhost:
+    host: 127.0.0.1
+    port: 21025
+    secure: false
+    username: rtsbot
+    password: insecure
+    branch: default
   pserver:
     host: 127.0.0.1
     port: 21025

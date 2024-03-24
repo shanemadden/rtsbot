@@ -3,7 +3,7 @@
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js';
 
 import './client_scripts.js';
-import * as screeps_bot from '../pkg/screeps_starter_rust.js';
+import * as screeps_bot from '../pkg/rtsbot.js';
 
 // glue functions for client scripts
 global.update_selected_object = screeps_bot.update_selected_object;

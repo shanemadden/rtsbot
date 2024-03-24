@@ -1,0 +1,37 @@
+version: "3"
+services:
+  screeps:
+    image: ghcr.io/jomik/screeps-server:edge
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - 127.0.0.1:21025:21025/tcp
+      - 127.0.0.1:21028:21028/tcp
+    volumes:
+      - ./config.yml:/screeps/config.yml
+      - ./dist:/screeps/mods/rtsbot/dist
+      - ./package.json:/screeps/mods/rtsbot/package.json
+      - screeps-data:/data
+      - screeps-mods:/screeps/mods
+    environment:
+      MONGO_HOST: mongo
+      REDIS_HOST: redis
+      STEAM_KEY: ${STEAM_KEY:?required}
+
+  mongo:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    command: --quiet
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis-data:/data
+
+volumes:
+  screeps-data:
+  screeps-mods:
+  redis-data:
+  mongo-data:

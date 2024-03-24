@@ -41,5 +41,9 @@ nbproject
 *.sublime-project
 *.sublime-workspace
 node_modules
-screeps.toml
+/assets/
+
+# Secrets #
+###########
 .screeps.yaml
+.env
