@@ -35,8 +35,16 @@ pub fn setup_logging(verbosity: log::LevelFilter) {
     fern::Dispatch::new()
         .level(verbosity)
         .format(|out, message, record| {
+            let color = match record.level() {
+                Level::Error => "#DC5257",
+                Level::Warn => "#DC5257",
+                Level::Info => "#F3C87B",
+                Level::Debug => "#7986CB",
+                Level::Trace => "#444444",
+            };
             out.finish(format_args!(
-                "({}) {}: {}",
+                "<font color=\"{}\">[{}]</font> {}: {}",
+                color,
                 record.level(),
                 record.target(),
                 message

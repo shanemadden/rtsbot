@@ -74,7 +74,7 @@ async function run_rollup(use_terser) {
       commonjs(),
       nodeResolve(),
       copy({
-        targets: [{ src: 'pkg/*.wasm', dest: 'dist' }]
+        targets: [{ src: 'pkg/rtsbot_bg.wasm', dest: 'dist', rename: 'rtsbot.wasm' }]
       }),
     ]
   });

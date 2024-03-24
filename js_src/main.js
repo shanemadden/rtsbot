@@ -1,7 +1,4 @@
 "use strict";
-// replace this with the name of your module
-const MODULE_NAME = "screeps_starter_rust_bg";
-
 // TextEncoder/Decoder polyfill for UTF-8 conversion
 import 'fastestsmallesttextencoderdecoder-encodeinto/EncoderDecoderTogether.min.js';
 
@@ -29,7 +26,7 @@ function console_error() {
             return arg;
         }
     }).join(' ');
-    console.log("ERROR:", processedArgs);
+    console.log('<font color="#DC5257">[ERROR]</font>', processedArgs);
     Game.notify(processedArgs);
 }
 
@@ -40,7 +37,7 @@ let running = false;
 // forgotten instead of persisted on global reset, and RawMemory used from within wasm
 let js_memory = {};
 
-function main_loop() {
+function loaded_loop() {
     if (running) {
         // we've had an error on the last tick; skip execution during the current tick, asking to
         // have our IVM immediately destroyed so we get a fresh environment next tick;
@@ -62,7 +59,7 @@ function main_loop() {
             // cancellation), setting to false won't happen which will cause a halt() next tick
             running = false;
         } catch (error) {
-            console.log("caught exception, will reset next tick: ", error);
+            console.log(`<font color="#DC5257">[ERROR]</font> rtsbot: caught exception, will halt next tick: ${error}`);
             // not logging stack since we've already logged the stack trace from rust via the panic
             // hook and that one is generally better, but if we need it, uncomment:
 
@@ -74,34 +71,24 @@ function main_loop() {
 }
 
 // cache for each step of the wasm module's initialization
-let wasm_bytes;
-let wasm_module;
-let wasm_instance;
+let wasm_bytes, wasm_module, wasm_instance;
 
 module.exports.loop = function() {
     // attempt to load the wasm only if there's lots of bucket
-    if (Game.cpu.bucket < 1000) {
-        console.log("low bucket for wasm compile, waiting" + JSON.stringify(Game.cpu));
+    if (Game.cpu.bucket < 1250) {
+        console.log(`<font color="#DC5257">[WARN]</font> rtsbot: startup deferred; ${Game.cpu.bucket} / 1250 required bucket`);
         return;
     }
-    // load the module, which we do here instead of at the top of the file, because that can
-    // potentially cause the module to be unable to load if it's too heavy, and trap the load cycle
-    // with no bucket to recover
-    if (!wasm_bytes) {
-        wasm_bytes = require(MODULE_NAME);
-    }
-    // compile wasm module from bytes
-    if (!wasm_module) {
-        wasm_module = new WebAssembly.Module(wasm_bytes);
-    }
-    // initialize the module instance with its imports
-    if (!wasm_instance) {
-        wasm_instance = screeps_bot.initSync(wasm_module);
-    }
+    
+    // run each step of the load process, saving each result so that this can happen over multiple ticks
+    if (!wasm_bytes) wasm_bytes = require('rtsbot');
+    if (!wasm_module) wasm_module = new WebAssembly.Module(wasm_bytes);
+    if (!wasm_instance) wasm_instance = screeps_bot.initSync(wasm_module);
+
     // remove the bytes from the heap and require cache, we don't need 'em anymore
     wasm_bytes = null;
-    delete require.cache[MODULE_NAME];
+    delete require.cache['rtsbot'];
     // replace this function with the post-load loop for next tick
-    module.exports.loop = main_loop;
-    console.log("loading complete, CPU used: " + Game.cpu.getUsed())
+    module.exports.loop = loaded_loop;
+    console.log(`<font color="#F3C87B">[INFO]</font> rtsbot: loading complete, CPU used: ${Game.cpu.getUsed()}`)
 }
