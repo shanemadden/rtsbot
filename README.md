@@ -1,6 +1,9 @@
-# screeps-starter-rust
+# rtsbot
 
 Example Rust AI for [Screeps: World][screeps], the JavaScript-based MMO game.
+
+This bot aims to provide a relatively capable Screeps bot, but with an emphasis on RTS-style
+manual unit control, enabled via scripts injected into the Screeps client via log messages.
 
 This uses the [`screeps-game-api`] bindings from the [rustyscreeps] organization.
 

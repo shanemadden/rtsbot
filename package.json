@@ -1,24 +1,24 @@
 {
-  "name": "screeps-starter-rust",
-  "version": "0.0.0",
-  "description": "Starter Rust AI for Screeps: World, the JavaScript-based MMO game.",
+  "name": "rtsbot",
+  "version": "0.1.0",
+  "description": "Screeps: World AI written in Rust with an emphasis on RTS-style manual control",
   "files": [
     "dist/"
   ],
   "main": "dist/main.js",
   "scripts": {
-    "deploy": "node tools/build_and_deploy.js"
+    "deploy": "node js_tools/deploy.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rustyscreeps/screeps-starter-rust.git"
+    "url": "git+https://github.com/shanemadden/rtsbot.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rustyscreeps/screeps-starter-rust/issues"
+    "url": "https://github.com/shanemadden/rtsbot/issues"
   },
-  "homepage": "https://github.com/rustyscreeps/screeps-starter-rust#readme",
+  "homepage": "https://github.com/shanemadden/rtsbot#readme",
   "dependencies": {
     "fastestsmallesttextencoderdecoder-encodeinto": "^1.0.22"
   },
