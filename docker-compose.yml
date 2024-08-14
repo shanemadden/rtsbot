@@ -28,6 +28,7 @@ services:
     image: redis:alpine
     volumes:
       - redis-data:/data
+    command: --appendonly yes --appendfsync no --save ''
 
   maps-nginx:
     image: nginx:alpine
